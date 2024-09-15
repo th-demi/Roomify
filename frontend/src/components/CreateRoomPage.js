@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Grid, Typography, TextField, FormHelperText, FormControl, FormControlLabel, Radio, RadioGroup, Collapse } from "@mui/material";
-
+import Alert from "@mui/material/Alert";
 // Functional component with default parameter values
 const CreateRoomPage = ({
   votesToSkip = 2,
@@ -52,7 +52,7 @@ const CreateRoomPage = ({
 
     const response = await fetch("/api/update", requestOptions);
     if (response.ok){
-      setSuccessMsg("Room created successfully!");
+      setSuccessMsg("Room updated successfully!");
       updateCallback();
     }else{
       setErrorMsg("Failed to update room.");
@@ -87,7 +87,13 @@ const CreateRoomPage = ({
   return (
     <Grid container spacing={1}>
       <Grid item xs={12} align="center">
-        <Collapse in={errorMsg != "" || successMsg != ""}>{successMsg}</Collapse>
+        <Collapse in={errorMsg != "" || successMsg != ""}>
+          <Grid container justifyContent="center">
+            <Grid item xs={12} sm={8} md={6} lg={4}>
+              {successMsg != "" ? (<Alert severity="success" onClose={() => setSuccessMsg("")}>{successMsg}</Alert>) : <Alert severity="error" onClose={() => setErrorMsg("")}>{errorMsg}</Alert>}
+            </Grid>
+          </Grid>
+        </Collapse>
         <Typography component="h4" variant="h4">{title}</Typography>
       </Grid>
       <Grid item xs={12} align="center">
