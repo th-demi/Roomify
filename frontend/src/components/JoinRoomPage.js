@@ -25,7 +25,7 @@ const JoinRoomPage = () => {
   return (
     <Grid container spacing={1} align="center">
       <Grid item xs={12}>
-        <Typography variant="h4" component="h4">Join a Room</Typography>
+        <Typography variant="h4" component="h4" sx={{ color: 'white', textTransform: 'uppercase', }}>Join a Room</Typography>
       </Grid>
       <Grid item xs={12}>
         <TextField
@@ -36,6 +36,7 @@ const JoinRoomPage = () => {
           onChange={(e) => setRoomCode(e.target.value)}
           helperText={error}
           variant="outlined"
+          sx={{input: { color: 'white',}, label: { color: 'white',},}}
         />
       </Grid>
       <Grid item xs={12}>

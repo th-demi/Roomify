@@ -26,14 +26,16 @@ const HomePage = () => {
     return (
       <Grid container spacing={3} align="center">
         <Grid item xs={12}>
-          <Typography variant="h3" component="h3">Roomify</Typography>
+          <Typography variant="h3" component="h3" sx={{ color: 'white', textTransform: 'uppercase', }}>Roomify</Typography>
         </Grid>
         <Grid item xs={12}>
-          <ButtonGroup variant="contained" color="primary">
-            <Button color="primary" to='/join' component={Link}>Join a Room</Button>
-            <Button color="success" to='/info' component={Link}>Info</Button>
-            <Button color="secondary" to='/create' component={Link}>Create a Room</Button>
-          </ButtonGroup>
+            <Button color="primary" variant="contained" to='/join' component={Link}>Join a Room</Button>
+        </Grid>
+        <Grid item xs={12}>
+            <Button color="secondary" variant="contained" to='/create' component={Link}>Create a Room</Button>
+        </Grid>
+        <Grid item xs={12}>
+            <Button color="success" to='/info' component={Link} sx={{ color: 'white'}}>Info</Button>
         </Grid>
       </Grid>
     );

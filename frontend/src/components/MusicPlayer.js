@@ -33,19 +33,21 @@ const Player = ({ song }) => {
   };
 
   return (
-    <Card>
-      <Grid container alignItems="center">
-        <Grid item align="center" xs={4}>
-          <img src={song.image_url} height="100%" width="100%" alt="Album Cover" />
+    <Card sx={{ width: 300, height: 'auto', display: 'flex', flexDirection: 'column', padding: 2 }}>
+      <Grid container direction="column" alignItems="center">
+        <Grid item>
+          <img src={song.image_url} height="200" width="200" alt="Album Cover" />
         </Grid>
-        <Grid item align="center" xs={8}>
+        <Grid item>
           <Typography component="h5" variant="h5">
             {song.title}
           </Typography>
           <Typography color="textSecondary" variant="subtitle1">
             {song.artist}
           </Typography>
-          <div>
+        </Grid>
+        <Grid item>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <IconButton onClick={song.is_playing ? pauseSong : playSong}>
               {song.is_playing ? <Pause /> : <PlayArrow />}
             </IconButton>
@@ -55,8 +57,11 @@ const Player = ({ song }) => {
             <Typography>{song.total_votes}/{song.votes_required_to_skip}</Typography>
           </div>
         </Grid>
+        <Grid item sx={{ width: '100%' }}>
+          <LinearProgress variant="determinate" value={songProgress} sx={{ height: 10 }} />
+        </Grid>
+
       </Grid>
-      <LinearProgress variant="determinate" value={songProgress} />
     </Card>
   );
 };

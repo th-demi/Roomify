@@ -94,7 +94,7 @@ const CreateRoomPage = ({
             </Grid>
           </Grid>
         </Collapse>
-        <Typography component="h4" variant="h4">{title}</Typography>
+        <Typography component="h4" variant="h4" sx={{ color: 'white', textTransform: 'uppercase', }}>{title}</Typography>
       </Grid>
       <Grid item xs={12} align="center">
         <FormControl>

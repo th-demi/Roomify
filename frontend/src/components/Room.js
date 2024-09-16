@@ -127,7 +127,7 @@ const Room = ({ leaveRoomCallback }) => {
   ) : (
     <Grid container spacing={1} align="center" justifyContent="center" alignItems="center">
       <Grid item xs={12}>
-        <Typography variant="h6" component="h6">
+        <Typography variant="h6" component="h6" sx={{ color: 'white', textTransform: 'uppercase', }}>
           Code: {roomCode} {/* Display room code */}
         </Typography>
       </Grid>
