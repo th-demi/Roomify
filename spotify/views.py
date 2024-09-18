@@ -138,16 +138,18 @@ class SkipSong(APIView):
         # Check if the user has already voted
         existing_vote = Votes.objects.filter(user=session_key, room=room, song_id=current_song).first()
 
-        if session_key == room.host or total_votes + 1 >= votes_needed:
-            # User is the host or there are enough votes to skip the song
-            Votes.objects.filter(room=room).delete()  # Clear all votes
+        if session_key == room.host or total_votes + (0 if existing_vote else 1) >= votes_needed:
+            # User is the host or the number of votes required is met or exceeded
+            if not existing_vote:
+                # Create a new vote for the user if it doesn't exist
+                Votes.objects.create(user=session_key, room=room, song_id=current_song)
+            Votes.objects.filter(room=room).delete()  # Clear all votes after skipping the song
             skip_song(room.host)
         elif existing_vote:
             # User has already voted, do nothing
             return Response({'error': 'You have already voted'}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            # Create a new vote for the user
+            # Create a new vote for the user if it doesn't exist
             Votes.objects.create(user=session_key, room=room, song_id=current_song)
 
         return Response({}, status=status.HTTP_204_NO_CONTENT)
-
