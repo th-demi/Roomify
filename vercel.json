@@ -8,8 +8,7 @@
     },
     {
       "src": "static/frontend/**",
-      "use": "@vercel/static",
-      "config": { "distDir": "static/frontend" }
+      "use": "@vercel/static"
     }
   ],
   "routes": [
