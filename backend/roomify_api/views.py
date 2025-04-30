@@ -139,6 +139,10 @@ class UserInRoomView(APIView):
 
     def get(self, request):
         try:
+            print("Request headers:", dict(request.headers))
+            print("Session key:", request.session.session_key)
+            print("Session exists:", request.session.exists(request.session.session_key))
+            
             if not request.session.exists(request.session.session_key):
                 request.session.create()
                 request.session.save()  # Explicitly save the session
@@ -150,13 +154,21 @@ class UserInRoomView(APIView):
                 'session_key': request.session.session_key,
                 'session_exists': request.session.exists(request.session.session_key)
             }
-            return Response(data, status=status.HTTP_200_OK)
+            print("Response data:", data)
+            
+            response = Response(data, status=status.HTTP_200_OK)
+            response["Access-Control-Allow-Origin"] = request.headers.get('Origin', '*')
+            response["Access-Control-Allow-Credentials"] = "true"
+            return response
         except Exception as e:
             print(f"Error in UserInRoomView: {str(e)}")
-            return Response(
+            response = Response(
                 {'error': 'Internal server error', 'details': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+            response["Access-Control-Allow-Origin"] = request.headers.get('Origin', '*')
+            response["Access-Control-Allow-Credentials"] = "true"
+            return response
 
 
 class LeaveRoomView(APIView):

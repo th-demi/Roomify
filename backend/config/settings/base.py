@@ -42,7 +42,15 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     'Content-Type',
     'Accept',
     'Authorization',
+    'Origin',
+    'Access-Control-Allow-Origin',
+    'Access-Control-Allow-Credentials',
 ]
+CORS_EXPOSE_HEADERS = [
+    'Access-Control-Allow-Origin',
+    'Access-Control-Allow-Credentials',
+]
+CORS_ORIGIN_ALLOW_ALL = True  # Temporarily allow all origins for testing
 
 # Session settings
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
