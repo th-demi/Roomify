@@ -45,6 +45,7 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+CORS_ORIGIN_ALLOW_ALL = True  # Temporarily allow all origins for testing
 
 # REST Framework settings
 REST_FRAMEWORK = {

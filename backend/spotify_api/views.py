@@ -50,8 +50,9 @@ class SpotifyCallbackView(APIView):
 
     def get(self, request):
         print("Entered SpotifyCallbackView")
-        print("Request session key before creating/checking:",
-              request.session.session_key)
+        print("Request session key before creating/checking:", request.session.session_key)
+        print("Request headers:", request.headers)
+        print("Request GET parameters:", request.GET)
 
         # Ensure session exists
         if not request.session.exists(request.session.session_key):
@@ -63,6 +64,13 @@ class SpotifyCallbackView(APIView):
         # Extract authorization code from request
         code = request.GET.get('code')
         print("Spotify auth code received:", code)
+
+        if not code:
+            print("No code received from Spotify")
+            return Response(
+                {'error': 'No authorization code received'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Exchange code for access token
         response = post(
@@ -76,7 +84,14 @@ class SpotifyCallbackView(APIView):
             }
         ).json()
 
-        print("Explicit Token Response:", response)
+        print("Token response:", response)
+
+        if 'error' in response:
+            print("Error in token response:", response['error'])
+            return Response(
+                {'error': response['error']},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Extract token information
         access_token = response.get('access_token')
