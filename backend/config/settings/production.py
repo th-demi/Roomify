@@ -34,6 +34,14 @@ LOGGING = {
     },
 }
 
+# Update ALLOWED_HOSTS for production
+ALLOWED_HOSTS = [
+    'roomify-backend-uowa.onrender.com',
+    'localhost',
+    '127.0.0.1',
+    'demi-roomify.vercel.app',
+]
+
 # Security settings
 SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
