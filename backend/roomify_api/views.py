@@ -132,11 +132,15 @@ class UserInRoomView(APIView):
     def get(self, request):
         if not request.session.exists(request.session.session_key):
             request.session.create()
+            request.session.save()  # Explicitly save the session
             print("Newly created session key in homepage:",
                   request.session.session_key)
 
-        data = {'code': request.session.get(
-            'room_code'), 'session_key': request.session.session_key}
+        data = {
+            'code': request.session.get('room_code'),
+            'session_key': request.session.session_key,
+            'session_exists': request.session.exists(request.session.session_key)
+        }
         return JsonResponse(data, status=status.HTTP_200_OK)
 
 
