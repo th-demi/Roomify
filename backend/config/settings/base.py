@@ -22,6 +22,24 @@ DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = [
+    "https://demi-roomify.vercel.app",
+    "http://localhost:3000",
+]
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'X-CSRFToken',
+]
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -110,14 +128,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# CORS settings
-CORS_ALLOWED_ORIGINS = os.getenv(
-    'CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = list(default_headers) + [
-    'Access-Control-Allow-Origin',  # Allow the correct origin to be set dynamically
-]
 
 # Session settings
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
