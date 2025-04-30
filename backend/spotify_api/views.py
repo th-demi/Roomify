@@ -17,6 +17,7 @@ from .utils import (
 )
 from .models import Vote
 from roomify_api.models import Room
+import secrets
 
 
 class AuthURLView(APIView):
@@ -25,12 +26,17 @@ class AuthURLView(APIView):
     """
 
     def get(self, request):
+        # Properly format scopes with spaces
         scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing'
+        
+        # Generate a random state parameter for security
+        state = secrets.token_urlsafe(16)
+        request.session['spotify_auth_state'] = state
 
-        # Remove trailing slash from redirect URI if present
+        # Remove trailing slash from redirect URI
         redirect_uri = settings.SPOTIFY_REDIRECT_URI.rstrip('/')
 
-        # Create Spotify authorization URL
+        # Create Spotify authorization URL with proper parameters
         url = Request(
             'GET',
             'https://accounts.spotify.com/authorize',
@@ -38,11 +44,13 @@ class AuthURLView(APIView):
                 'scope': scopes,
                 'response_type': 'code',
                 'redirect_uri': redirect_uri,
-                'client_id': settings.SPOTIFY_CLIENT_ID
+                'client_id': settings.SPOTIFY_CLIENT_ID,
+                'state': state,
+                'show_dialog': True  # Force user to select account
             }
         ).prepare().url
-        print("Explicit Spotify Auth URL:", url)
 
+        print("Spotify Auth URL:", url)
         return Response({'url': url}, status=status.HTTP_200_OK)
 
 
@@ -53,74 +61,96 @@ class SpotifyCallbackView(APIView):
 
     def get(self, request):
         print("Entered SpotifyCallbackView")
-        print("Request session key before creating/checking:", request.session.session_key)
+        print("Request session key:", request.session.session_key)
         print("Request headers:", request.headers)
         print("Request GET parameters:", request.GET)
 
+        # Verify state parameter
+        state = request.GET.get('state')
+        stored_state = request.session.get('spotify_auth_state')
+        
+        if state is None or state != stored_state:
+            print("State mismatch or missing")
+            return Response(
+                {'error': 'state_mismatch'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Clear the state from session
+        request.session.pop('spotify_auth_state', None)
+
         # Ensure session exists
         if not request.session.exists(request.session.session_key):
-            print("Created new session:", request.session.session_key)
+            print("Creating new session")
             request.session.create()
-        else:
-            print("Using existing session:", request.session.session_key)
+            print("New session key:", request.session.session_key)
 
-        # Extract authorization code from request
+        # Extract authorization code
         code = request.GET.get('code')
-        print("Spotify auth code received:", code)
-
         if not code:
-            print("No code received from Spotify")
+            print("No authorization code received")
             return Response(
                 {'error': 'No authorization code received'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Remove trailing slash from redirect URI if present
+        # Remove trailing slash from redirect URI
         redirect_uri = settings.SPOTIFY_REDIRECT_URI.rstrip('/')
 
         # Exchange code for access token
-        response = post(
-            'https://accounts.spotify.com/api/token',
-            data={
-                'grant_type': 'authorization_code',
-                'code': code,
-                'redirect_uri': redirect_uri,
-                'client_id': settings.SPOTIFY_CLIENT_ID,
-                'client_secret': settings.SPOTIFY_CLIENT_SECRET
-            }
-        ).json()
+        try:
+            response = post(
+                'https://accounts.spotify.com/api/token',
+                data={
+                    'grant_type': 'authorization_code',
+                    'code': code,
+                    'redirect_uri': redirect_uri,
+                    'client_id': settings.SPOTIFY_CLIENT_ID,
+                    'client_secret': settings.SPOTIFY_CLIENT_SECRET
+                },
+                headers={
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            ).json()
 
-        print("Token response:", response)
+            print("Token response:", response)
 
-        if 'error' in response:
-            print("Error in token response:", response['error'])
-            return Response(
-                {'error': response['error']},
-                status=status.HTTP_400_BAD_REQUEST
+            if 'error' in response:
+                print("Error in token response:", response['error'])
+                return Response(
+                    {'error': response['error']},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Extract token information
+            access_token = response.get('access_token')
+            token_type = response.get('token_type')
+            refresh_token = response.get('refresh_token')
+            expires_in = response.get('expires_in')
+
+            # Save tokens to database
+            print("Saving Spotify tokens...")
+            update_or_create_user_tokens(
+                request.session.session_key,
+                access_token,
+                token_type,
+                expires_in,
+                refresh_token
             )
 
-        # Extract token information
-        access_token = response.get('access_token')
-        token_type = response.get('token_type')
-        refresh_token = response.get('refresh_token')
-        expires_in = response.get('expires_in')
+            # Redirect to frontend
+            frontend_url = settings.CORS_ALLOWED_ORIGINS[0]
+            room_code = request.session.get('room_code')
+            if room_code:
+                return redirect(f"{frontend_url}/room/{room_code}")
+            return redirect(f"{frontend_url}")
 
-        # Save tokens to database
-        print("Saving Spotify tokens...")
-        update_or_create_user_tokens(
-            request.session.session_key,
-            access_token,
-            token_type,
-            expires_in,
-            refresh_token
-        )
-
-        # Redirect to frontend
-        frontend_url = settings.CORS_ALLOWED_ORIGINS[0]
-        room_code = request.session.get('room_code')
-        if room_code:
-            return redirect(f"{frontend_url}/room/{room_code}")
-        return redirect(f"{frontend_url}")
+        except Exception as e:
+            print("Error during token exchange:", str(e))
+            return Response(
+                {'error': 'Failed to exchange authorization code for tokens'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class IsAuthenticatedView(APIView):
