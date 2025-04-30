@@ -27,6 +27,9 @@ class AuthURLView(APIView):
     def get(self, request):
         scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing'
 
+        # Remove trailing slash from redirect URI if present
+        redirect_uri = settings.SPOTIFY_REDIRECT_URI.rstrip('/')
+
         # Create Spotify authorization URL
         url = Request(
             'GET',
@@ -34,7 +37,7 @@ class AuthURLView(APIView):
             params={
                 'scope': scopes,
                 'response_type': 'code',
-                'redirect_uri': settings.SPOTIFY_REDIRECT_URI,
+                'redirect_uri': redirect_uri,
                 'client_id': settings.SPOTIFY_CLIENT_ID
             }
         ).prepare().url
@@ -72,13 +75,16 @@ class SpotifyCallbackView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Remove trailing slash from redirect URI if present
+        redirect_uri = settings.SPOTIFY_REDIRECT_URI.rstrip('/')
+
         # Exchange code for access token
         response = post(
             'https://accounts.spotify.com/api/token',
             data={
                 'grant_type': 'authorization_code',
                 'code': code,
-                'redirect_uri': settings.SPOTIFY_REDIRECT_URI,
+                'redirect_uri': redirect_uri,
                 'client_id': settings.SPOTIFY_CLIENT_ID,
                 'client_secret': settings.SPOTIFY_CLIENT_SECRET
             }
