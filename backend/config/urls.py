@@ -3,18 +3,13 @@ URL configuration for Roomify project.
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
 @api_view(['GET'])
 def health_check(request):
-    return Response({
-        "status": "healthy",
-        "version": "1.0.0",
-        "api": "Roomify API"
-    })
+    return Response({"status": "healthy"})
 
 
 @api_view(['GET'])
