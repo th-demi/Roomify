@@ -26,6 +26,7 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 CORS_ALLOWED_ORIGINS = [
     "https://demi-roomify.vercel.app",
     "http://localhost:3000",
+    "https://roomify-backend-uowa.onrender.com",
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
@@ -38,6 +39,9 @@ CORS_ALLOW_METHODS = [
 ]
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'X-CSRFToken',
+    'Content-Type',
+    'Accept',
+    'Authorization',
 ]
 
 # Session settings
@@ -46,11 +50,14 @@ SESSION_COOKIE_NAME = 'sessionid'
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_DOMAIN = None  # Allow cookies for all domains
+SESSION_SAVE_EVERY_REQUEST = True
 CSRF_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = [
     "https://demi-roomify.vercel.app",
     "http://localhost:3000",
+    "https://roomify-backend-uowa.onrender.com",
 ]
 
 # Application definition

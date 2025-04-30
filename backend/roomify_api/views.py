@@ -24,42 +24,50 @@ class CreateRoomView(APIView):
     serializer_class = CreateRoomSerializer
 
     def post(self, request):
-        # Ensure session exists
-        if not request.session.exists(request.session.session_key):
-            request.session.create()
-            request.session.save()
-            print("Newly created session key in Create Room Page:",
-                  request.session.session_key)
+        try:
+            # Ensure session exists
+            if not request.session.exists(request.session.session_key):
+                request.session.create()
+                request.session.save()
+                print("Newly created session key in Create Room Page:",
+                      request.session.session_key)
 
-        # Validate and process the data
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            guest_can_pause = serializer.validated_data['guest_can_pause']
-            votes_to_skip = serializer.validated_data['votes_to_skip']
-            host = request.session.session_key
+            # Validate and process the data
+            serializer = self.serializer_class(data=request.data)
+            if serializer.is_valid():
+                guest_can_pause = serializer.validated_data['guest_can_pause']
+                votes_to_skip = serializer.validated_data['votes_to_skip']
+                host = request.session.session_key
 
-            # Try to get an existing room or create a new one
-            room, created = Room.objects.update_or_create(
-                host=host,
-                defaults={
-                    'guest_can_pause': guest_can_pause,
-                    'votes_to_skip': votes_to_skip
-                }
-            )
+                # Try to get an existing room or create a new one
+                room, created = Room.objects.update_or_create(
+                    host=host,
+                    defaults={
+                        'guest_can_pause': guest_can_pause,
+                        'votes_to_skip': votes_to_skip
+                    }
+                )
 
-            # Store room code in session
-            request.session['room_code'] = room.code
+                # Store room code in session
+                request.session['room_code'] = room.code
 
-            # Return the room data
+                # Return the room data
+                return Response(
+                    RoomSerializer(room).data,
+                    status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
+                )
+
+            print(f"Serializer errors: {serializer.errors}")
             return Response(
-                RoomSerializer(room).data,
-                status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
+                {'error': 'Invalid data', 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST
             )
-
-        return Response(
-            {'error': 'Invalid data', 'details': serializer.errors},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        except Exception as e:
+            print(f"Error in CreateRoomView: {str(e)}")
+            return Response(
+                {'error': 'Internal server error', 'details': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class GetRoomView(APIView):
@@ -130,18 +138,25 @@ class UserInRoomView(APIView):
     """
 
     def get(self, request):
-        if not request.session.exists(request.session.session_key):
-            request.session.create()
-            request.session.save()  # Explicitly save the session
-            print("Newly created session key in homepage:",
-                  request.session.session_key)
+        try:
+            if not request.session.exists(request.session.session_key):
+                request.session.create()
+                request.session.save()  # Explicitly save the session
+                print("Newly created session key in homepage:",
+                      request.session.session_key)
 
-        data = {
-            'code': request.session.get('room_code'),
-            'session_key': request.session.session_key,
-            'session_exists': request.session.exists(request.session.session_key)
-        }
-        return JsonResponse(data, status=status.HTTP_200_OK)
+            data = {
+                'code': request.session.get('room_code'),
+                'session_key': request.session.session_key,
+                'session_exists': request.session.exists(request.session.session_key)
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"Error in UserInRoomView: {str(e)}")
+            return Response(
+                {'error': 'Internal server error', 'details': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class LeaveRoomView(APIView):
