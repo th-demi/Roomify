@@ -25,17 +25,20 @@ export default function Room({ roomCode }) {
   useEffect(() => {
     const getRoomDetails = async () => {
       try {
+        console.log('Fetching room details for code:', roomCode);
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/get/?code=${roomCode}`, {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
         })
 
         if (!response.ok) {
+          console.error('Failed to get room details:', response.status, response.statusText);
           leaveRoom()
           return
         }
 
         const data = await response.json()
+        console.log('Received room details:', data);
         setRoomDetails({
           votesToSkip: data.votes_to_skip,
           guestCanPause: data.guest_can_pause,
@@ -69,20 +72,24 @@ export default function Room({ roomCode }) {
 
   const authenticateSpotify = async () => {
     try {
+      console.log('Checking Spotify authentication status');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/spotify/is-authenticated/`, {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       })
       const data = await response.json()
+      console.log('Spotify authentication status:', data);
       setSpotifyAuthenticated(data.status)
 
       if (!data.status) {
+        console.log('Initiating Spotify authentication');
         const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/spotify/get-auth-url/`, {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
         })
 
         const authData = await authResponse.json()
+        console.log('Received Spotify auth URL:', authData);
         localStorage.setItem("spotifyAuthRedirect", roomCode)
         window.location.replace(authData.url)
       }

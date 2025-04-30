@@ -102,7 +102,6 @@ backend/media/
 # Frontend specific
 frontend/.next/
 frontend/node_modules/
-frontend/node_modules/
 frontend/.DS_Store
 frontend/updated_frontend.txt
 frontend/.vercel/
@@ -112,3 +111,6 @@ frontend/coverage/
 frontend/.pnpm-debug.log*
 frontend/*.tsbuildinfo
 frontend/next-env.d.ts
+
+# Allow frontend/src/lib
+!frontend/src/lib/

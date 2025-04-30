@@ -29,6 +29,7 @@ export default function JoinRoomPage() {
     setIsLoading(true)
 
     try {
+      console.log('Joining room with code:', roomCode);
       const response = await fetch(`${API_URL}/api/join/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -37,11 +38,15 @@ export default function JoinRoomPage() {
       })
 
       if (response.ok) {
+        const data = await response.json()
+        console.log('Successfully joined room:', data);
         router.push(`/room/${roomCode}`)
       } else {
+        console.error('Failed to join room:', response.status, response.statusText);
         toast.error("Room not found. Please check the room code and try again")
       }
     } catch (error) {
+      console.error("Failed to join room:", error)
       toast.error("Failed to join room. Please try again.")
     } finally {
       setIsLoading(false)

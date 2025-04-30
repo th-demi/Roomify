@@ -15,15 +15,19 @@ export default function HomePage() {
   useEffect(() => {
     const fetchRoomCode = async () => {
       try {
+        console.log('Checking if user is in a room');
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inroom/`, {
           credentials: "include",
         })
 
         if (response.ok) {
           const data = await response.json()
+          console.log('Inroom check response:', data);
           if (data.code) {
             setRoomCode(data.code)
           }
+        } else {
+          console.error('Failed to check inroom status:', response.status, response.statusText);
         }
       } catch (error) {
         console.error("Failed to fetch room code:", error)

@@ -96,11 +96,13 @@ export default function MusicPlayer({ song = {}, roomCode }) {
 
   const playSong = async () => {
     try {
-      await fetch(`${API_URL}/spotify/play/`, {
+      console.log('Sending play request');
+      const response = await fetch(`${API_URL}/spotify/play/`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       })
+      console.log('Play response:', response.status);
     } catch (error) {
       console.error("Failed to play song:", error)
     }
@@ -108,11 +110,13 @@ export default function MusicPlayer({ song = {}, roomCode }) {
 
   const pauseSong = async () => {
     try {
-      await fetch(`${API_URL}/spotify/pause/`, {
+      console.log('Sending pause request');
+      const response = await fetch(`${API_URL}/spotify/pause/`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       })
+      console.log('Pause response:', response.status);
     } catch (error) {
       console.error("Failed to pause song:", error)
     }
@@ -120,11 +124,13 @@ export default function MusicPlayer({ song = {}, roomCode }) {
 
   const skipSong = async () => {
     try {
-      await fetch(`${API_URL}/spotify/skip/`, {
+      console.log('Sending skip request');
+      const response = await fetch(`${API_URL}/spotify/skip/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       })
+      console.log('Skip response:', response.status);
     } catch (error) {
       console.error("Failed to skip song:", error)
     }

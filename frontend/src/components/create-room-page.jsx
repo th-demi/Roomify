@@ -31,6 +31,10 @@ export default function CreateRoomPage({
     setIsLoading(true)
 
     try {
+      console.log('Creating room with settings:', {
+        guestCanPause: guestCanPauseState,
+        votesToSkip: votesToSkipState
+      });
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -45,8 +49,10 @@ export default function CreateRoomPage({
 
       if (response.ok) {
         const data = await response.json()
+        console.log('Successfully created room:', data);
         router.push(`/room/${data.code}`)
       } else {
+        console.error('Failed to create room:', response.status, response.statusText);
         toast.error("Failed to create room. Please try again.")
       }
     } catch (error) {
