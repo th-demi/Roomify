@@ -139,21 +139,36 @@ class UserInRoomView(APIView):
 
     def get(self, request):
         try:
-            print("Request headers:", dict(request.headers))
+            # Log request details
+            print("\n=== Request Details ===")
+            print("Headers:", dict(request.headers))
+            print("Method:", request.method)
+            print("Path:", request.path)
+            print("GET params:", request.GET)
+            print("POST data:", request.POST)
+            print("Body:", request.body)
+            print("Content type:", request.content_type)
+            print("META:", {k: v for k, v in request.META.items() if k.startswith('HTTP_')})
+            
+            # Check session
+            print("\n=== Session Details ===")
             print("Session key:", request.session.session_key)
             print("Session exists:", request.session.exists(request.session.session_key))
+            print("Session data:", dict(request.session))
             
             # Ensure session exists
             if not request.session.session_key:
+                print("Creating new session...")
                 request.session.create()
                 request.session.save()
-                print("Created new session with key:", request.session.session_key)
+                print("New session key:", request.session.session_key)
             
             # Get session data
             room_code = request.session.get('room_code')
             session_key = request.session.session_key
             session_exists = request.session.exists(request.session.session_key)
             
+            print("\n=== Response Data ===")
             print(f"Room code: {room_code}")
             print(f"Session key: {session_key}")
             print(f"Session exists: {session_exists}")
@@ -164,15 +179,19 @@ class UserInRoomView(APIView):
                 'session_exists': session_exists
             }
             
-            print("Response data:", data)
-            
             response = Response(data, status=status.HTTP_200_OK)
             response["Access-Control-Allow-Origin"] = request.headers.get('Origin', '*')
             response["Access-Control-Allow-Credentials"] = "true"
+            
+            print("\n=== Response Headers ===")
+            print(dict(response.headers))
+            
             return response
             
         except Exception as e:
-            print(f"Error in UserInRoomView: {str(e)}")
+            print("\n=== Error Details ===")
+            print(f"Error type: {type(e)}")
+            print(f"Error message: {str(e)}")
             import traceback
             print("Traceback:", traceback.format_exc())
             
