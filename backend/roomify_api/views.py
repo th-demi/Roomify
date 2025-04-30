@@ -143,27 +143,45 @@ class UserInRoomView(APIView):
             print("Session key:", request.session.session_key)
             print("Session exists:", request.session.exists(request.session.session_key))
             
-            if not request.session.exists(request.session.session_key):
+            # Ensure session exists
+            if not request.session.session_key:
                 request.session.create()
-                request.session.save()  # Explicitly save the session
-                print("Newly created session key in homepage:",
-                      request.session.session_key)
-
+                request.session.save()
+                print("Created new session with key:", request.session.session_key)
+            
+            # Get session data
+            room_code = request.session.get('room_code')
+            session_key = request.session.session_key
+            session_exists = request.session.exists(request.session.session_key)
+            
+            print(f"Room code: {room_code}")
+            print(f"Session key: {session_key}")
+            print(f"Session exists: {session_exists}")
+            
             data = {
-                'code': request.session.get('room_code'),
-                'session_key': request.session.session_key,
-                'session_exists': request.session.exists(request.session.session_key)
+                'code': room_code,
+                'session_key': session_key,
+                'session_exists': session_exists
             }
+            
             print("Response data:", data)
             
             response = Response(data, status=status.HTTP_200_OK)
             response["Access-Control-Allow-Origin"] = request.headers.get('Origin', '*')
             response["Access-Control-Allow-Credentials"] = "true"
             return response
+            
         except Exception as e:
             print(f"Error in UserInRoomView: {str(e)}")
+            import traceback
+            print("Traceback:", traceback.format_exc())
+            
             response = Response(
-                {'error': 'Internal server error', 'details': str(e)},
+                {
+                    'error': 'Internal server error',
+                    'details': str(e),
+                    'traceback': traceback.format_exc()
+                },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             response["Access-Control-Allow-Origin"] = request.headers.get('Origin', '*')
