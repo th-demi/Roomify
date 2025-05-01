@@ -39,9 +39,16 @@ class AuthURLView(APIView):
         request.session['spotify_auth_state'] = state
         print(f"Generated state parameter: {state}")
         
-        # Remove trailing slash from redirect URI
+        # Ensure redirect URI matches exactly what's in Spotify Developer Dashboard
+        # Remove any trailing slashes and ensure it's the exact URL registered
         redirect_uri = settings.SPOTIFY_REDIRECT_URI.rstrip('/')
-        print(f"Redirect URI after removing trailing slash: {redirect_uri}")
+        if not redirect_uri:
+            print("❌ No redirect URI configured")
+            return Response(
+                {'error': 'No redirect URI configured'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        print(f"Using redirect URI: {redirect_uri}")
         
         # Create Spotify authorization URL with proper parameters
         auth_params = {
@@ -121,8 +128,14 @@ class SpotifyCallbackView(APIView):
             )
         print(f"✅ Authorization code received: {code[:10]}...")
 
-        # Remove trailing slash from redirect URI
+        # Ensure redirect URI matches exactly what's in Spotify Developer Dashboard
         redirect_uri = settings.SPOTIFY_REDIRECT_URI.rstrip('/')
+        if not redirect_uri:
+            print("❌ No redirect URI configured")
+            return Response(
+                {'error': 'No redirect URI configured'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         print(f"\nUsing redirect URI: {redirect_uri}")
 
         # Exchange code for access token
