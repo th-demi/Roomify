@@ -26,31 +26,45 @@ class AuthURLView(APIView):
     """
 
     def get(self, request):
+        # Log the raw redirect URI from settings
+        print("\n=== Spotify Auth URL Generation ===")
+        print(f"Raw SPOTIFY_REDIRECT_URI from settings: {settings.SPOTIFY_REDIRECT_URI}")
+        
         # Properly format scopes with spaces
         scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing'
+        print(f"Scopes being used: {scopes}")
         
         # Generate a random state parameter for security
         state = secrets.token_urlsafe(16)
         request.session['spotify_auth_state'] = state
-
+        print(f"Generated state parameter: {state}")
+        
         # Remove trailing slash from redirect URI
         redirect_uri = settings.SPOTIFY_REDIRECT_URI.rstrip('/')
-
+        print(f"Redirect URI after removing trailing slash: {redirect_uri}")
+        
         # Create Spotify authorization URL with proper parameters
+        auth_params = {
+            'scope': scopes,
+            'response_type': 'code',
+            'redirect_uri': redirect_uri,
+            'client_id': settings.SPOTIFY_CLIENT_ID,
+            'state': state,
+            'show_dialog': True
+        }
+        print("\nAuth URL Parameters:")
+        for key, value in auth_params.items():
+            print(f"{key}: {value}")
+        
         url = Request(
             'GET',
             'https://accounts.spotify.com/authorize',
-            params={
-                'scope': scopes,
-                'response_type': 'code',
-                'redirect_uri': redirect_uri,
-                'client_id': settings.SPOTIFY_CLIENT_ID,
-                'state': state,
-                'show_dialog': True  # Force user to select account
-            }
+            params=auth_params
         ).prepare().url
-
-        print("Spotify Auth URL:", url)
+        
+        print(f"\nFinal Auth URL: {url}")
+        print("=== End Auth URL Generation ===\n")
+        
         return Response({'url': url}, status=status.HTTP_200_OK)
 
 
@@ -60,93 +74,112 @@ class SpotifyCallbackView(APIView):
     """
 
     def get(self, request):
-        print("Entered SpotifyCallbackView")
-        print("Request session key:", request.session.session_key)
-        print("Request headers:", request.headers)
-        print("Request GET parameters:", request.GET)
+        print("\n=== Spotify Callback Received ===")
+        print("Request Details:")
+        print(f"Session key: {request.session.session_key}")
+        print(f"Request path: {request.path}")
+        print(f"Request GET parameters: {dict(request.GET)}")
+        print(f"Request headers: {dict(request.headers)}")
 
         # Verify state parameter
         state = request.GET.get('state')
         stored_state = request.session.get('spotify_auth_state')
+        print(f"\nState verification:")
+        print(f"Received state: {state}")
+        print(f"Stored state: {stored_state}")
         
         if state is None or state != stored_state:
-            print("State mismatch or missing")
+            print("❌ State mismatch or missing")
             return Response(
                 {'error': 'state_mismatch'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        print("✅ State verification passed")
 
         # Clear the state from session
         request.session.pop('spotify_auth_state', None)
 
         # Ensure session exists
         if not request.session.exists(request.session.session_key):
-            print("Creating new session")
+            print("\nCreating new session")
             request.session.create()
-            print("New session key:", request.session.session_key)
+            print(f"New session key: {request.session.session_key}")
 
         # Extract authorization code
         code = request.GET.get('code')
         if not code:
-            print("No authorization code received")
+            print("❌ No authorization code received")
             return Response(
                 {'error': 'No authorization code received'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        print(f"✅ Authorization code received: {code[:10]}...")
 
         # Remove trailing slash from redirect URI
         redirect_uri = settings.SPOTIFY_REDIRECT_URI.rstrip('/')
+        print(f"\nUsing redirect URI: {redirect_uri}")
 
         # Exchange code for access token
         try:
+            print("\nExchanging code for tokens...")
+            token_data = {
+                'grant_type': 'authorization_code',
+                'code': code,
+                'redirect_uri': redirect_uri,
+                'client_id': settings.SPOTIFY_CLIENT_ID,
+                'client_secret': settings.SPOTIFY_CLIENT_SECRET
+            }
+            print("Token exchange parameters:")
+            for key, value in token_data.items():
+                if key != 'client_secret':
+                    print(f"{key}: {value}")
+                else:
+                    print(f"{key}: [REDACTED]")
+
             response = post(
                 'https://accounts.spotify.com/api/token',
-                data={
-                    'grant_type': 'authorization_code',
-                    'code': code,
-                    'redirect_uri': redirect_uri,
-                    'client_id': settings.SPOTIFY_CLIENT_ID,
-                    'client_secret': settings.SPOTIFY_CLIENT_SECRET
-                },
+                data=token_data,
                 headers={
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             ).json()
 
-            print("Token response:", response)
-
+            print("\nToken exchange response:")
             if 'error' in response:
-                print("Error in token response:", response['error'])
+                print(f"❌ Error in token response: {response['error']}")
                 return Response(
                     {'error': response['error']},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-
-            # Extract token information
-            access_token = response.get('access_token')
-            token_type = response.get('token_type')
-            refresh_token = response.get('refresh_token')
-            expires_in = response.get('expires_in')
+            print("✅ Token exchange successful")
+            print(f"Access token received: {response['access_token'][:10]}...")
+            print(f"Token type: {response['token_type']}")
+            print(f"Expires in: {response['expires_in']} seconds")
+            print(f"Refresh token received: {response['refresh_token'][:10]}...")
 
             # Save tokens to database
-            print("Saving Spotify tokens...")
+            print("\nSaving tokens to database...")
             update_or_create_user_tokens(
                 request.session.session_key,
-                access_token,
-                token_type,
-                expires_in,
-                refresh_token
+                response['access_token'],
+                response['token_type'],
+                response['expires_in'],
+                response['refresh_token']
             )
+            print("✅ Tokens saved successfully")
 
             # Redirect to frontend
             frontend_url = settings.CORS_ALLOWED_ORIGINS[0]
             room_code = request.session.get('room_code')
-            if room_code:
-                return redirect(f"{frontend_url}/room/{room_code}")
-            return redirect(f"{frontend_url}")
+            redirect_url = f"{frontend_url}/room/{room_code}" if room_code else frontend_url
+            print(f"\nRedirecting to: {redirect_url}")
+            print("=== End Callback Processing ===\n")
+            
+            return redirect(redirect_url)
 
         except Exception as e:
-            print("Error during token exchange:", str(e))
+            print(f"\n❌ Error during token exchange: {str(e)}")
+            print("=== End Callback Processing with Error ===\n")
             return Response(
                 {'error': 'Failed to exchange authorization code for tokens'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
