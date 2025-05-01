@@ -109,7 +109,14 @@ def execute_spotify_api_request(session_id, endpoint, post_=False, put_=False):
     """
     tokens = get_user_tokens(session_id)
     if not tokens:
+        print(f"No tokens found for session: {session_id}")
         return {'error': 'User not authenticated with Spotify'}
+
+    # Check if token is expired and refresh if needed
+    if tokens.expires_in <= timezone.now():
+        print(f"Token expired for session: {session_id}, refreshing...")
+        refresh_spotify_token(session_id)
+        tokens = get_user_tokens(session_id)  # Get refreshed tokens
 
     headers = {
         'Content-Type': 'application/json',

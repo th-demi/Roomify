@@ -246,10 +246,9 @@ class CurrentSongView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Get currently playing song from Spotify
-        host = room.host
+        # Get currently playing song from Spotify using host's tokens
         endpoint = "player/currently-playing"
-        response = execute_spotify_api_request(host, endpoint)
+        response = execute_spotify_api_request(room.host, endpoint)
 
         print("Current song response:", response)
 
