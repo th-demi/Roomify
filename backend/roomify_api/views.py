@@ -110,26 +110,52 @@ class JoinRoomView(APIView):
     lookup_url_kwarg = 'code'
 
     def post(self, request):
-        if not request.session.exists(request.session.session_key):
-            request.session.create()
+        try:
+            # Log request details
+            print("\n=== Join Room Request ===")
+            print("Headers:", dict(request.headers))
+            print("Session key:", request.session.session_key)
+            print("Session exists:", request.session.exists(request.session.session_key))
+            print("Current room code in session:", request.session.get('room_code'))
 
-        code = request.data.get(self.lookup_url_kwarg)
-        if not code:
+            # Ensure session exists
+            if not request.session.exists(request.session.session_key):
+                print("Creating new session for guest...")
+                request.session.create()
+                request.session.save()
+                print("New session key:", request.session.session_key)
+
+            code = request.data.get(self.lookup_url_kwarg)
+            if not code:
+                return Response(
+                    {'error': 'Room code not provided'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            room = Room.objects.filter(code=code).first()
+            if not room:
+                return Response(
+                    {'error': 'Room not found with the provided code'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            # Store room code in session
+            request.session['room_code'] = code
+            print("Room code stored in session:", code)
+
+            # Return room details
+            data = RoomSerializer(room).data
+            data['is_host'] = request.session.session_key == room.host
+            print("User is host:", data['is_host'])
+
+            return Response(data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(f"Error in JoinRoomView: {str(e)}")
             return Response(
-                {'error': 'Room code not provided'},
-                status=status.HTTP_400_BAD_REQUEST
+                {'error': 'Internal server error', 'details': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-        room = Room.objects.filter(code=code).first()
-        if not room:
-            return Response(
-                {'error': 'Room not found with the provided code'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        # Store room code in session
-        request.session['room_code'] = code
-        return Response({'message': 'Room joined successfully'}, status=status.HTTP_200_OK)
 
 
 class UserInRoomView(APIView):
@@ -140,72 +166,55 @@ class UserInRoomView(APIView):
     def get(self, request):
         try:
             # Log request details
-            print("\n=== Request Details ===")
+            print("\n=== UserInRoom Request ===")
             print("Headers:", dict(request.headers))
-            print("Method:", request.method)
-            print("Path:", request.path)
-            print("GET params:", request.GET)
-            print("POST data:", request.POST)
-            print("Body:", request.body)
-            print("Content type:", request.content_type)
-            print("META:", {k: v for k, v in request.META.items() if k.startswith('HTTP_')})
-            
-            # Check session
-            print("\n=== Session Details ===")
             print("Session key:", request.session.session_key)
             print("Session exists:", request.session.exists(request.session.session_key))
-            print("Session data:", dict(request.session))
-            
+            print("Current room code in session:", request.session.get('room_code'))
+
             # Ensure session exists
-            if not request.session.session_key:
+            if not request.session.exists(request.session.session_key):
                 print("Creating new session...")
                 request.session.create()
                 request.session.save()
                 print("New session key:", request.session.session_key)
-            
-            # Get session data
+
+            # Get room code from session
             room_code = request.session.get('room_code')
-            session_key = request.session.session_key
-            session_exists = request.session.exists(request.session.session_key)
-            
-            print("\n=== Response Data ===")
-            print(f"Room code: {room_code}")
-            print(f"Session key: {session_key}")
-            print(f"Session exists: {session_exists}")
-            
+            if not room_code:
+                print("No room code found in session")
+                return Response(
+                    {'code': None, 'session_key': request.session.session_key},
+                    status=status.HTTP_200_OK
+                )
+
+            # Get room details
+            room = Room.objects.filter(code=room_code).first()
+            if not room:
+                print(f"Room not found for code: {room_code}")
+                request.session.pop('room_code', None)
+                return Response(
+                    {'code': None, 'session_key': request.session.session_key},
+                    status=status.HTTP_200_OK
+                )
+
+            # Return room details
             data = {
                 'code': room_code,
-                'session_key': session_key,
-                'session_exists': session_exists
+                'session_key': request.session.session_key,
+                'is_host': request.session.session_key == room.host,
+                'room_details': RoomSerializer(room).data
             }
-            
-            response = Response(data, status=status.HTTP_200_OK)
-            response["Access-Control-Allow-Origin"] = request.headers.get('Origin', '*')
-            response["Access-Control-Allow-Credentials"] = "true"
-            
-            print("\n=== Response Headers ===")
-            print(dict(response.headers))
-            
-            return response
-            
+            print("User is host:", data['is_host'])
+
+            return Response(data, status=status.HTTP_200_OK)
+
         except Exception as e:
-            print("\n=== Error Details ===")
-            print(f"Error type: {type(e)}")
-            print(f"Error message: {str(e)}")
-            import traceback
-            print("Traceback:", traceback.format_exc())
-            
-            response = Response(
-                {
-                    'error': 'Internal server error',
-                    'details': str(e),
-                    'traceback': traceback.format_exc()
-                },
+            print(f"Error in UserInRoomView: {str(e)}")
+            return Response(
+                {'error': 'Internal server error', 'details': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-            response["Access-Control-Allow-Origin"] = request.headers.get('Origin', '*')
-            response["Access-Control-Allow-Credentials"] = "true"
-            return response
 
 
 class LeaveRoomView(APIView):
