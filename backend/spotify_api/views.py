@@ -56,11 +56,17 @@ class AuthURLView(APIView):
         for key, value in auth_params.items():
             print(f"{key}: {value}")
         
-        url = Request(
-            'GET',
-            'https://accounts.spotify.com/authorize',
-            params=auth_params
-        ).prepare().url
+        # Manually construct the URL to ensure proper encoding
+        base_url = 'https://accounts.spotify.com/authorize'
+        query_params = '&'.join([
+            f'scope={scopes.replace(" ", "%20")}',
+            'response_type=code',
+            f'redirect_uri={redirect_uri}',
+            f'client_id={settings.SPOTIFY_CLIENT_ID}',
+            f'state={state}',
+            'show_dialog=True'
+        ])
+        url = f"{base_url}?{query_params}"
         
         print(f"\nFinal Auth URL: {url}")
         print("=== End Auth URL Generation ===\n")
@@ -136,17 +142,25 @@ class SpotifyCallbackView(APIView):
                 else:
                     print(f"{key}: [REDACTED]")
 
-            response = post(
+            # Make the token exchange request
+            token_response = post(
                 'https://accounts.spotify.com/api/token',
                 data=token_data,
                 headers={
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
-            ).json()
+            )
 
+            # Log the raw response for debugging
+            print(f"\nRaw token response status: {token_response.status_code}")
+            print(f"Raw token response headers: {dict(token_response.headers)}")
+            
+            response = token_response.json()
             print("\nToken exchange response:")
+            
             if 'error' in response:
                 print(f"❌ Error in token response: {response['error']}")
+                print(f"Error description: {response.get('error_description', 'No description')}")
                 return Response(
                     {'error': response['error']},
                     status=status.HTTP_400_BAD_REQUEST
