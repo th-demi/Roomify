@@ -172,8 +172,8 @@ export default function MusicPlayer({ song = {}, roomCode }) {
             </div>
 
             {/* Song Info */}
-            <div className="w-full p-4">
-              <div className="text-center space-y-1 w-full mb-3">
+            <div className="w-full p-3">
+              <div className="text-center space-y-1 w-full mb-2">
                 <AnimatePresence mode="wait">
                   <motion.h3
                     key={currentSong.title}
