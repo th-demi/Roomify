@@ -169,14 +169,11 @@ export default function MusicPlayer({ song = {}, roomCode }) {
                 alt={currentSong.title}
                 className="w-full h-full object-cover"
               />
-
-              {/* Reflection effect */}
-              <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/40 to-transparent backdrop-blur-sm"></div>
             </div>
 
             {/* Song Info */}
-            <div className="w-full p-6 pt-4">
-              <div className="text-center space-y-1 w-full mb-4">
+            <div className="w-full p-4">
+              <div className="text-center space-y-1 w-full mb-3">
                 <AnimatePresence mode="wait">
                   <motion.h3
                     key={currentSong.title}

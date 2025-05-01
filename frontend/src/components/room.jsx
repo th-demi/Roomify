@@ -182,7 +182,7 @@ export default function Room({ roomCode }) {
   }
 
   return (
-    <div className={`flex items-center justify-center h-screen p-4 animated-bg room-${roomCode} overflow-hidden`}>
+    <div className={`flex items-center justify-center min-h-screen p-4 animated-bg room-${roomCode} overflow-hidden`}>
       <div className="blob bg-purple-500"></div>
       <div className="blob bg-pink-500"></div>
       <div className="blob bg-blue-500"></div>
@@ -196,7 +196,7 @@ export default function Room({ roomCode }) {
       >
         <Card className="glass-dark border-none shadow-2xl overflow-hidden rounded-3xl">
           <CardContent className="p-6">
-            <div className="flex flex-col items-center space-y-6">
+            <div className="flex flex-col items-center space-y-4">
               <div className="w-full flex justify-between items-center">
                 <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
                   <div className="flex items-center gap-2">
