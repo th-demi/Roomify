@@ -115,12 +115,40 @@ export default function Room({ roomCode }) {
           return
         }
 
+        if (response.status === 403) {
+          console.log("Host is not authenticated with Spotify")
+          setSong({
+            title: "Host not authenticated",
+            artist: "Please ask the host to connect to Spotify",
+            image_url: "/placeholder.svg?height=300&width=300",
+            is_playing: false,
+          })
+          return
+        }
+
+        if (response.status === 500) {
+          console.log("Failed to fetch current song")
+          setSong({
+            title: "Error fetching song",
+            artist: "Please try again later",
+            image_url: "/placeholder.svg?height=300&width=300",
+            is_playing: false,
+          })
+          return
+        }
+
         if (response.ok) {
           const data = await response.json()
           setSong(data)
         }
       } catch (error) {
         console.error("Failed to get current song:", error)
+        setSong({
+          title: "Connection error",
+          artist: "Please check your connection",
+          image_url: "/placeholder.svg?height=300&width=300",
+          is_playing: false,
+        })
       }
     }
 

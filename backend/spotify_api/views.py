@@ -246,6 +246,13 @@ class CurrentSongView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+        # Check if host is authenticated with Spotify
+        if not is_spotify_authenticated(room.host):
+            return Response(
+                {'error': 'Host is not authenticated with Spotify'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         # Get currently playing song from Spotify using host's tokens
         endpoint = "player/currently-playing"
         response = execute_spotify_api_request(room.host, endpoint)
@@ -253,7 +260,14 @@ class CurrentSongView(APIView):
         print("Current song response:", response)
 
         # Handle error or no song playing
-        if 'error' in response or 'item' not in response:
+        if 'error' in response:
+            print(f"Spotify API error: {response['error']}")
+            return Response(
+                {'error': 'Failed to fetch current song from Spotify'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        if 'item' not in response:
             return Response({}, status=status.HTTP_204_NO_CONTENT)
 
         # Extract song information
