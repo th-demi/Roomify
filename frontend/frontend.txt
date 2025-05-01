@@ -1,0 +1,2356 @@
+Directory Structure of Frontend:
+.
+|-- src
+|   |-- app
+|   |   |-- create
+|   |   |   `-- page.jsx
+|   |   |-- info
+|   |   |   `-- page.jsx
+|   |   |-- join
+|   |   |   `-- page.jsx
+|   |   |-- room
+|   |   |   `-- [roomCode]
+|   |   |       `-- page.jsx
+|   |   |-- favicon.ico
+|   |   |-- globals.css
+|   |   |-- layout.jsx
+|   |   `-- page.jsx
+|   |-- components
+|   |   |-- ui
+|   |   |   |-- alert.jsx
+|   |   |   |-- button.jsx
+|   |   |   |-- card.jsx
+|   |   |   |-- input.jsx
+|   |   |   |-- label.jsx
+|   |   |   |-- progress.jsx
+|   |   |   |-- radio-group.jsx
+|   |   |   `-- sonner.jsx
+|   |   |-- create-room-page.jsx
+|   |   |-- home-page.jsx
+|   |   |-- info.jsx
+|   |   |-- join-room-page.jsx
+|   |   |-- music-player.jsx
+|   |   |-- room.jsx
+|   |   |-- sonner-provider.jsx
+|   |   `-- theme-provider.jsx
+|   `-- lib
+|       `-- utils.js
+|-- components.json
+|-- eslint.config.mjs
+|-- frontend.sh
+|-- frontend.txt
+|-- jsconfig.json
+|-- next.config.mjs
+|-- package.json
+|-- postcss.config.mjs
+`-- tailwind.config.js
+
+
+### Code Contents ###
+
+
+### Contents of: ./jsconfig.json ###
+{
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
+
+
+### Contents of: ./tailwind.config.js ###
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: ["class"],
+  content: [
+    "./pages/**/*.{js,jsx}",
+    "./components/**/*.{js,jsx}",
+    "./app/**/*.{js,jsx}",
+    "./src/**/*.{js,jsx}",
+    "*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        // Custom vibrant colors
+        violet: {
+          400: "#a78bfa",
+          500: "#8b5cf6",
+          600: "#7c3aed",
+        },
+        fuchsia: {
+          400: "#e879f9",
+          500: "#d946ef",
+          600: "#c026d3",
+        },
+        pink: {
+          400: "#f472b6",
+          500: "#ec4899",
+          600: "#db2777",
+        },
+        indigo: {
+          400: "#818cf8",
+          500: "#6366f1",
+          600: "#4f46e5",
+        },
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)"],
+        montserrat: ["var(--font-montserrat)"],
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 4px)",
+        "2xl": "calc(var(--radius) + 8px)",
+        "3xl": "calc(var(--radius) + 12px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: 0 },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: 0 },
+        },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        pulse: {
+          "0%, 100%": { opacity: 0.6 },
+          "50%": { opacity: 0.8 },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        float: "float 6s ease-in-out infinite",
+        pulse: "pulse 4s ease-in-out infinite",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+}
+
+
+### Contents of: ./postcss.config.mjs ###
+const config = {
+  plugins: ["@tailwindcss/postcss"],
+};
+
+export default config;
+
+
+### Contents of: ./next.config.mjs ###
+/** @type {import('next').NextConfig} */
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const nextConfig = {
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, 'src'),
+    };
+    return config;
+  },
+};
+
+export default nextConfig;
+
+
+### Contents of: ./package.json ###
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@radix-ui/react-label": "^2.1.2",
+    "@radix-ui/react-progress": "^1.1.2",
+    "@radix-ui/react-radio-group": "^1.2.3",
+    "@radix-ui/react-slot": "^1.1.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.6.3",
+    "lucide-react": "^0.487.0",
+    "next": "15.2.4",
+    "next-themes": "^0.4.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sonner": "^2.0.3",
+    "tailwind-merge": "^3.1.0",
+    "tailwindcss-animate": "^1.0.7",
+    "tw-animate-css": "^1.2.5"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "15.2.4",
+    "tailwindcss": "^4"
+  }
+}
+
+
+### Contents of: ./components.json ###
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": true,
+  "tsx": false,
+  "tailwind": {
+    "config": "",
+    "css": "src/app/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  },
+  "iconLibrary": "lucide"
+}
+
+### Contents of: ./eslint.config.mjs ###
+import { dirname } from "path";
+import { fileURLToPath } from "url";
+import { FlatCompat } from "@eslint/eslintrc";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
+const eslintConfig = [...compat.extends("next/core-web-vitals")];
+
+export default eslintConfig;
+
+
+### Contents of: ./src/app/layout.jsx ###
+import { Inter, Montserrat } from "next/font/google"
+import { ThemeProvider } from "@/components/theme-provider"
+import { SonnerProvider } from "@/components/sonner-provider"
+import "./globals.css"
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+  weight: ["400", "500", "600", "700", "800"],
+})
+
+export const metadata = {
+  title: "Roomify",
+  description: "Share music rooms with friends",
+}
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+      </head>
+      <body className={`${inter.variable} ${montserrat.variable} font-sans`}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <SonnerProvider />
+          <main className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600">{children}</main>
+        </ThemeProvider>
+      </body>
+    </html>
+  )
+}
+
+
+### Contents of: ./src/app/room/[roomCode]/page.jsx ###
+import Room from "@/components/room"
+
+export default async function RoomPage({ params }) {
+  const resolvedParams = await params;
+  return <Room roomCode={resolvedParams.roomCode} />
+}
+
+
+### Contents of: ./src/app/join/page.jsx ###
+import JoinRoomPage from "@/components/join-room-page"
+
+export default function JoinPage() {
+  return <JoinRoomPage />
+}
+
+
+
+### Contents of: ./src/app/page.jsx ###
+import HomePage from "@/components/home-page"
+
+export default function Home() {
+  return <HomePage />
+}
+
+
+
+### Contents of: ./src/app/info/page.jsx ###
+import Info from "@/components/info"
+
+export default function InfoPage() {
+  return <Info />
+}
+
+
+
+### Contents of: ./src/app/create/page.jsx ###
+import CreateRoomPage from "@/components/create-room-page"
+
+export default function CreatePage() {
+  return <CreateRoomPage />
+}
+
+
+
+### Contents of: ./src/app/globals.css ###
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 1rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.65 0.3 330);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.7 0.25 350);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.1 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.15 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.15 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.7 0.25 330);
+  --primary-foreground: oklch(0.1 0 0);
+  --secondary: oklch(0.2 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.2 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.65 0.3 350);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.15 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.2 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Animation keyframes */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes wave {
+  0% {
+    transform: translateX(0) translateZ(0) scaleY(1);
+  }
+  50% {
+    transform: translateX(-25%) translateZ(0) scaleY(0.8);
+  }
+  100% {
+    transform: translateX(-50%) translateZ(0) scaleY(1);
+  }
+}
+
+/* Animated background */
+.animated-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-bg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  filter: blur(30px);
+  transform: scale(1.1);
+  z-index: -1;
+}
+
+.animated-bg .blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.7;
+  animation: pulse 8s infinite ease-in-out;
+  z-index: -1;
+  transition: background 1s ease-in-out;
+}
+
+.animated-bg .blob:nth-child(1) {
+  width: 300px;
+  height: 300px;
+  top: -150px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.animated-bg .blob:nth-child(2) {
+  width: 350px;
+  height: 350px;
+  bottom: -150px;
+  right: -100px;
+  animation-delay: 2s;
+}
+
+.animated-bg .blob:nth-child(3) {
+  width: 250px;
+  height: 250px;
+  bottom: 40%;
+  left: -120px;
+  animation-delay: 4s;
+}
+
+.animated-bg .blob:nth-child(4) {
+  width: 280px;
+  height: 280px;
+  top: 30%;
+  right: -140px;
+  animation-delay: 6s;
+}
+
+/* Glass morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.glass-dark {
+  background: rgba(15, 15, 15, 0.5);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Album art reflection */
+.album-reflection {
+  position: relative;
+}
+
+.album-reflection::after {
+  content: "";
+  position: absolute;
+  bottom: -20px;
+  left: 10%;
+  width: 80%;
+  height: 20px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+  filter: blur(5px);
+  border-radius: 50%;
+  z-index: -1;
+}
+
+/* Animated waves */
+.wave-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 100px;
+  overflow: hidden;
+}
+
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z' opacity='.25' fill='%23FFFFFF'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  animation: wave 12s linear infinite;
+  z-index: 1;
+}
+
+.wave:nth-child(2) {
+  bottom: 10px;
+  opacity: 0.5;
+  animation: wave 8s linear infinite;
+}
+
+.wave:nth-child(3) {
+  bottom: 20px;
+  opacity: 0.2;
+  animation: wave 6s linear infinite;
+}
+
+/* Equalizer animation */
+.equalizer {
+  display: flex;
+  align-items: flex-end;
+  height: 20px;
+  gap: 2px;
+}
+
+.equalizer-bar {
+  width: 3px;
+  background: currentColor;
+  border-radius: 1px;
+  animation: equalize 1.5s ease-in-out infinite;
+}
+
+.equalizer-bar:nth-child(1) {
+  animation-delay: 0.0s;
+}
+.equalizer-bar:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.equalizer-bar:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.equalizer-bar:nth-child(4) {
+  animation-delay: 0.6s;
+}
+.equalizer-bar:nth-child(5) {
+  animation-delay: 0.8s;
+}
+
+@keyframes equalize {
+  0%,
+  100% {
+    height: 5px;
+  }
+  50% {
+    height: 20px;
+  }
+}
+
+/* Button hover effects */
+.btn-hover-effect {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.btn-hover-effect::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+  z-index: -1;
+}
+
+.btn-hover-effect:hover::before {
+  width: 300%;
+  height: 300%;
+}
+
+
+### Contents of: ./src/components/ui/radio-group.jsx ###
+"use client"
+
+import * as React from "react"
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
+import { CircleIcon } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+
+function RadioGroup({
+  className,
+  ...props
+}) {
+  return (
+    <RadioGroupPrimitive.Root
+      data-slot="radio-group"
+      className={cn("grid gap-3", className)}
+      {...props} />
+  );
+}
+
+function RadioGroupItem({
+  className,
+  ...props
+}) {
+  return (
+    <RadioGroupPrimitive.Item
+      data-slot="radio-group-item"
+      className={cn(
+        "border-input text-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 aspect-square size-4 shrink-0 rounded-full border shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+        className
+      )}
+      {...props}>
+      <RadioGroupPrimitive.Indicator
+        data-slot="radio-group-indicator"
+        className="relative flex items-center justify-center">
+        <CircleIcon
+          className="fill-primary absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2" />
+      </RadioGroupPrimitive.Indicator>
+    </RadioGroupPrimitive.Item>
+  );
+}
+
+export { RadioGroup, RadioGroupItem }
+
+
+### Contents of: ./src/components/ui/input.jsx ###
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+function Input({
+  className,
+  type,
+  ...props
+}) {
+  return (
+    <input
+      type={type}
+      data-slot="input"
+      className={cn(
+        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+        className
+      )}
+      {...props} />
+  );
+}
+
+export { Input }
+
+
+### Contents of: ./src/components/ui/button.jsx ###
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva } from "class-variance-authority";
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline:
+          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        icon: "size-9",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+
+function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}) {
+  const Comp = asChild ? Slot : "button"
+
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props} />
+  );
+}
+
+export { Button, buttonVariants }
+
+
+### Contents of: ./src/components/ui/progress.jsx ###
+"use client"
+
+import * as React from "react"
+import * as ProgressPrimitive from "@radix-ui/react-progress"
+
+import { cn } from "@/lib/utils"
+
+function Progress({
+  className,
+  value,
+  ...props
+}) {
+  return (
+    <ProgressPrimitive.Root
+      data-slot="progress"
+      className={cn(
+        "bg-primary/20 relative h-2 w-full overflow-hidden rounded-full",
+        className
+      )}
+      {...props}>
+      <ProgressPrimitive.Indicator
+        data-slot="progress-indicator"
+        className="bg-primary h-full w-full flex-1 transition-all"
+        style={{ transform: `translateX(-${100 - (value || 0)}%)` }} />
+    </ProgressPrimitive.Root>
+  );
+}
+
+export { Progress }
+
+
+### Contents of: ./src/components/ui/card.jsx ###
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+function Card({
+  className,
+  ...props
+}) {
+  return (
+    <div
+      data-slot="card"
+      className={cn(
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
+        className
+      )}
+      {...props} />
+  );
+}
+
+function CardHeader({
+  className,
+  ...props
+}) {
+  return (
+    <div
+      data-slot="card-header"
+      className={cn(
+        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
+        className
+      )}
+      {...props} />
+  );
+}
+
+function CardTitle({
+  className,
+  ...props
+}) {
+  return (
+    <div
+      data-slot="card-title"
+      className={cn("leading-none font-semibold", className)}
+      {...props} />
+  );
+}
+
+function CardDescription({
+  className,
+  ...props
+}) {
+  return (
+    <div
+      data-slot="card-description"
+      className={cn("text-muted-foreground text-sm", className)}
+      {...props} />
+  );
+}
+
+function CardAction({
+  className,
+  ...props
+}) {
+  return (
+    <div
+      data-slot="card-action"
+      className={cn(
+        "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
+        className
+      )}
+      {...props} />
+  );
+}
+
+function CardContent({
+  className,
+  ...props
+}) {
+  return (<div data-slot="card-content" className={cn("px-6", className)} {...props} />);
+}
+
+function CardFooter({
+  className,
+  ...props
+}) {
+  return (
+    <div
+      data-slot="card-footer"
+      className={cn("flex items-center px-6 [.border-t]:pt-6", className)}
+      {...props} />
+  );
+}
+
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardAction,
+  CardDescription,
+  CardContent,
+}
+
+
+### Contents of: ./src/components/ui/alert.jsx ###
+import * as React from "react"
+import { cva } from "class-variance-authority";
+
+import { cn } from "@/lib/utils"
+
+const alertVariants = cva(
+  "relative w-full rounded-lg border px-4 py-3 text-sm grid has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] grid-cols-[0_1fr] has-[>svg]:gap-x-3 gap-y-0.5 items-start [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current",
+  {
+    variants: {
+      variant: {
+        default: "bg-card text-card-foreground",
+        destructive:
+          "text-destructive bg-card [&>svg]:text-current *:data-[slot=alert-description]:text-destructive/90",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+function Alert({
+  className,
+  variant,
+  ...props
+}) {
+  return (
+    <div
+      data-slot="alert"
+      role="alert"
+      className={cn(alertVariants({ variant }), className)}
+      {...props} />
+  );
+}
+
+function AlertTitle({
+  className,
+  ...props
+}) {
+  return (
+    <div
+      data-slot="alert-title"
+      className={cn("col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight", className)}
+      {...props} />
+  );
+}
+
+function AlertDescription({
+  className,
+  ...props
+}) {
+  return (
+    <div
+      data-slot="alert-description"
+      className={cn(
+        "text-muted-foreground col-start-2 grid justify-items-start gap-1 text-sm [&_p]:leading-relaxed",
+        className
+      )}
+      {...props} />
+  );
+}
+
+export { Alert, AlertTitle, AlertDescription }
+
+
+### Contents of: ./src/components/ui/sonner.jsx ###
+"use client"
+
+import { useTheme } from "next-themes"
+import { Toaster as Sonner } from "sonner";
+
+const Toaster = ({
+  ...props
+}) => {
+  const { theme = "system" } = useTheme()
+
+  return (
+    <Sonner
+      theme={theme}
+      className="toaster group"
+      style={
+        {
+          "--normal-bg": "var(--popover)",
+          "--normal-text": "var(--popover-foreground)",
+          "--normal-border": "var(--border)"
+        }
+      }
+      {...props} />
+  );
+}
+
+export { Toaster }
+
+
+### Contents of: ./src/components/ui/label.jsx ###
+"use client"
+
+import * as React from "react"
+import * as LabelPrimitive from "@radix-ui/react-label"
+
+import { cn } from "@/lib/utils"
+
+function Label({
+  className,
+  ...props
+}) {
+  return (
+    <LabelPrimitive.Root
+      data-slot="label"
+      className={cn(
+        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+        className
+      )}
+      {...props} />
+  );
+}
+
+export { Label }
+
+
+### Contents of: ./src/components/create-room-page.jsx ###
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
+import { ArrowLeft, Music } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { toast } from "sonner"
+import { motion } from "framer-motion"
+
+export default function CreateRoomPage({
+  votesToSkip = 2,
+  guestCanPause = true,
+  update = false,
+  roomCode = null,
+  updateCallback = () => {},
+}) {
+  const [guestCanPauseState, setGuestCanPauseState] = useState(guestCanPause)
+  const [votesToSkipState, setVotesToSkipState] = useState(votesToSkip)
+  const [isLoading, setIsLoading] = useState(false)
+  const [successMsg, setSuccessMsg] = useState("")
+  const router = useRouter()
+
+  const handleCreateRoom = async (e) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      console.log('Creating room with settings:', {
+        guestCanPause: guestCanPauseState,
+        votesToSkip: votesToSkipState
+      });
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          guest_can_pause: guestCanPauseState,
+          votes_to_skip: votesToSkipState,
+        }),
+        credentials: "include",
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/create/`, requestOptions)
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Successfully created room:', data);
+        router.push(`/room/${data.code}`)
+      } else {
+        console.error('Failed to create room:', response.status, response.statusText);
+        toast.error("Failed to create room. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error creating room:", error)
+      toast.error("Failed to create room. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleUpdateRoom = async (e) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      const requestOptions = {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          guest_can_pause: guestCanPauseState,
+          votes_to_skip: votesToSkipState,
+          code: roomCode,
+        }),
+        credentials: "include",
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/update/`, requestOptions)
+
+      if (response.ok) {
+        setSuccessMsg("Room updated successfully!")
+        toast.success("Room updated successfully!")
+        updateCallback()
+
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccessMsg(""), 3000)
+      } else {
+        const errorData = await response.json().catch(() => ({}))
+        toast.error(errorData.error || "Failed to update room. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error updating room:", error)
+      toast.error("Failed to update room. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen p-4 animated-bg">
+      <div className="blob bg-purple-500"></div>
+      <div className="blob bg-pink-500"></div>
+      <div className="blob bg-blue-500"></div>
+      <div className="blob bg-indigo-500"></div>
+
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Card className="bg-black/40 backdrop-blur-md border-none shadow-2xl overflow-hidden rounded-3xl">
+          <CardHeader className="pt-8 pb-4">
+            <CardTitle className="text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 font-montserrat">
+              {update ? "UPDATE ROOM" : "CREATE A ROOM"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-8 pt-4">
+            {successMsg && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Alert className="mb-6 bg-gradient-to-r from-green-500 to-emerald-500 border-none text-white">
+                  <AlertTitle>Success</AlertTitle>
+                  <AlertDescription>{successMsg}</AlertDescription>
+                </Alert>
+              </motion.div>
+            )}
+
+            <form onSubmit={update ? handleUpdateRoom : handleCreateRoom} className="space-y-8">
+              <motion.div
+                className="space-y-4"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                <Label className="text-white text-lg font-medium">Guest Control</Label>
+                <RadioGroup
+                  defaultValue={guestCanPauseState ? "true" : "false"}
+                  onValueChange={(value) => setGuestCanPauseState(value === "true")}
+                  className="flex justify-center space-x-8"
+                >
+                  <div className="flex flex-col items-center space-y-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm transition-all duration-300 hover:bg-white/10">
+                    <RadioGroupItem value="true" id="play-pause" className="h-5 w-5" />
+                    <Label htmlFor="play-pause" className="text-white font-medium">
+                      Play/Pause
+                    </Label>
+                  </div>
+                  <div className="flex flex-col items-center space-y-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm transition-all duration-300 hover:bg-white/10">
+                    <RadioGroupItem value="false" id="no-control" className="h-5 w-5" />
+                    <Label htmlFor="no-control" className="text-white font-medium">
+                      No Control
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </motion.div>
+
+              <motion.div
+                className="space-y-4"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Label htmlFor="votes" className="text-white text-lg font-medium">
+                  Votes to Skip
+                </Label>
+                <Input
+                  id="votes"
+                  type="number"
+                  min="1"
+                  value={votesToSkipState}
+                  onChange={(e) => setVotesToSkipState(Number(e.target.value))}
+                  className="h-14 text-lg text-center bg-white/10 backdrop-blur-sm border-white/10 text-white rounded-xl focus:border-purple-400 transition-all duration-300"
+                />
+              </motion.div>
+
+              <motion.div
+                className="flex flex-col space-y-4 pt-2"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Button
+                  type="submit"
+                  className="w-full h-14 text-lg font-medium rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 transition-all duration-300 shadow-lg shadow-pink-500/20"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-3 w-full">
+                      <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                      <span>{update ? "Updating..." : "Creating..."}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-3 w-full">
+                      <Music size={20} />
+                      <span>{update ? "Update Room" : "Create Room"}</span>
+                    </div>
+                  )}
+                </Button>
+
+                {!update && (
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full h-14 text-lg font-medium rounded-xl bg-white/10 border-none text-white hover:bg-white/20 transition-all duration-300"
+                  >
+                    <Link href="/" className="flex items-center justify-center gap-2">
+                      <ArrowLeft size={18} />
+                      Back
+                    </Link>
+                  </Button>
+                )}
+              </motion.div>
+            </form>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  )
+}
+
+
+### Contents of: ./src/components/join-room-page.jsx ###
+"use client"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowLeft, Users } from "lucide-react"
+import { toast } from "sonner"
+import { motion } from "framer-motion"
+
+export default function JoinRoomPage() {
+  const [roomCode, setRoomCode] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+
+  // Direct API URL (assuming it's defined in an environment variable)
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://your-backend-api.com"
+
+  const handleJoinRoom = async (e) => {
+    e.preventDefault()
+
+    if (!roomCode.trim()) {
+      toast.error("Please enter a room code")
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      console.log('Joining room with code:', roomCode);
+      const response = await fetch(`${API_URL}/api/join/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: roomCode }),
+        credentials: "include",
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Successfully joined room:', data);
+        router.push(`/room/${roomCode}`)
+      } else {
+        console.error('Failed to join room:', response.status, response.statusText);
+        toast.error("Room not found. Please check the room code and try again")
+      }
+    } catch (error) {
+      console.error("Failed to join room:", error)
+      toast.error("Failed to join room. Please try again.")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen p-4 animated-bg">
+      <div className="blob bg-purple-500"></div>
+      <div className="blob bg-pink-500"></div>
+      <div className="blob bg-blue-500"></div>
+      <div className="blob bg-indigo-500"></div>
+
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Card className="bg-black/40 backdrop-blur-md border-none shadow-2xl overflow-hidden rounded-3xl">
+          <CardHeader className="pt-8 pb-4">
+            <CardTitle className="text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 font-montserrat">
+              JOIN A ROOM
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-8 pt-4">
+            <form onSubmit={handleJoinRoom} className="space-y-8">
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+                <Input
+                  placeholder="Enter room code"
+                  value={roomCode}
+                  onChange={(e) => setRoomCode(e.target.value)}
+                  className="h-14 text-lg bg-white/10 backdrop-blur-sm border-white/10 text-white placeholder:text-white/70 rounded-xl focus:border-purple-400 transition-all duration-300"
+                />
+              </motion.div>
+
+              <motion.div
+                className="flex flex-col space-y-4 pt-2"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <Button
+                  type="submit"
+                  className="w-full h-14 text-lg font-medium rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 shadow-lg shadow-indigo-500/20"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-3 w-full">
+                      <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                      <span>Joining...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-3 w-full">
+                      <Users size={20} />
+                      <span>Join Room</span>
+                    </div>
+                  )}
+                </Button>
+
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full h-14 text-lg font-medium rounded-xl bg-white/10 border-none text-white hover:bg-white/20 transition-all duration-300"
+                >
+                  <Link href="/" className="flex items-center justify-center gap-2">
+                    <ArrowLeft size={18} />
+                    Back
+                  </Link>
+                </Button>
+              </motion.div>
+            </form>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  )
+}
+
+
+### Contents of: ./src/components/music-player.jsx ###
+"use client"
+
+import { useState, useEffect, useRef } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
+import { Play, Pause, SkipForward } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+
+export default function MusicPlayer({ song = {}, roomCode }) {
+  // Default empty song object to prevent errors when no song is playing
+  const defaultSong = {
+    title: "No song playing",
+    artist: "Connect to Spotify",
+    image_url: "/placeholder.svg?height=300&width=300",
+    is_playing: false,
+    time: 0,
+    duration: 1,
+    votes_required_to_skip: 1,
+    total_votes: 0,
+  }
+
+  // Merge provided song with defaults
+  const currentSong = { ...defaultSong, ...song }
+
+  // Calculate song progress percentage
+  const songProgress = (currentSong.time / currentSong.duration) * 100 || 0
+
+  // State for dominant color
+  const [dominantColor, setDominantColor] = useState("rgba(138, 43, 226, 0.8)")
+  const [secondaryColor, setSecondaryColor] = useState("rgba(219, 39, 119, 0.8)")
+
+  // Ref for canvas to extract colors
+  const canvasRef = useRef(null)
+
+  // Direct API URL (assuming it's defined in an environment variable)
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://your-backend-api.com"
+
+  // Format time in minutes:seconds
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`
+  }
+
+  // Extract dominant color from album art
+  useEffect(() => {
+    if (currentSong.image_url && currentSong.image_url !== defaultSong.image_url) {
+      const img = new Image()
+      img.crossOrigin = "anonymous"
+      img.src = currentSong.image_url
+
+      img.onload = () => {
+        const canvas = canvasRef.current
+        const ctx = canvas.getContext("2d", { willReadFrequently: true })
+
+        // Draw image to canvas
+        canvas.width = img.width
+        canvas.height = img.height
+        ctx.drawImage(img, 0, 0)
+
+        // Get image data
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+
+        // Simple color extraction - average of pixels
+        let r = 0,
+          g = 0,
+          b = 0,
+          count = 0
+
+        // Sample pixels (every 5th pixel to improve performance)
+        for (let i = 0; i < imageData.length; i += 20) {
+          r += imageData[i]
+          g += imageData[i + 1]
+          b += imageData[i + 2]
+          count++
+        }
+
+        // Calculate average
+        r = Math.floor(r / count)
+        g = Math.floor(g / count)
+        b = Math.floor(b / count)
+
+        // Set as dominant color with opacity
+        setDominantColor(`rgba(${r}, ${g}, ${b}, 0.8)`)
+
+        // Create a complementary/secondary color
+        setSecondaryColor(`rgba(${255 - r}, ${255 - g}, ${255 - b}, 0.8)`)
+      }
+    } else {
+      // Default colors if no image
+      setDominantColor("rgba(138, 43, 226, 0.8)")
+      setSecondaryColor("rgba(219, 39, 119, 0.8)")
+    }
+  }, [currentSong.image_url])
+
+  const playSong = async () => {
+    try {
+      console.log('Sending play request');
+      const response = await fetch(`${API_URL}/spotify/play/`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      })
+      console.log('Play response:', response.status);
+    } catch (error) {
+      console.error("Failed to play song:", error)
+    }
+  }
+
+  const pauseSong = async () => {
+    try {
+      console.log('Sending pause request');
+      const response = await fetch(`${API_URL}/spotify/pause/`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      })
+      console.log('Pause response:', response.status);
+    } catch (error) {
+      console.error("Failed to pause song:", error)
+    }
+  }
+
+  const skipSong = async () => {
+    try {
+      console.log('Sending skip request');
+      const response = await fetch(`${API_URL}/spotify/skip/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      })
+      console.log('Skip response:', response.status);
+    } catch (error) {
+      console.error("Failed to skip song:", error)
+    }
+  }
+
+  return (
+    <>
+      {/* Hidden canvas for color extraction */}
+      <canvas ref={canvasRef} style={{ display: "none" }} />
+
+      {/* Dynamic background based on album art */}
+      <style jsx global>{`
+        .room-${roomCode} .animated-bg .blob:nth-child(1) {
+          background: ${dominantColor};
+        }
+        .room-${roomCode} .animated-bg .blob:nth-child(2) {
+          background: ${secondaryColor};
+        }
+        .room-${roomCode} .animated-bg .blob:nth-child(3) {
+          background: ${dominantColor};
+          opacity: 0.7;
+        }
+        .room-${roomCode} .animated-bg .blob:nth-child(4) {
+          background: ${secondaryColor};
+          opacity: 0.7;
+        }
+      `}</style>
+
+      <Card className="w-full max-w-sm bg-black/40 backdrop-blur-md border-none shadow-2xl overflow-hidden rounded-3xl">
+        <CardContent className="p-0">
+          <div className="flex flex-col items-center">
+            {/* Album Art */}
+            <div className="relative w-full aspect-square overflow-hidden">
+              <img
+                src={currentSong.image_url || "/placeholder.svg"}
+                alt={currentSong.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Song Info */}
+            <div className="w-full p-3">
+              <div className="text-center space-y-1 w-full mb-2">
+                <AnimatePresence mode="wait">
+                  <motion.h3
+                    key={currentSong.title}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="text-2xl font-bold text-white truncate font-montserrat"
+                  >
+                    {currentSong.title}
+                  </motion.h3>
+                </AnimatePresence>
+
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={currentSong.artist}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3, delay: 0.1 }}
+                    className="text-white/80 truncate"
+                  >
+                    {currentSong.artist}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="space-y-2 mb-4">
+                <Progress
+                  value={songProgress}
+                  className="h-2 bg-white/10"
+                  style={{
+                    "--progress-background": dominantColor,
+                  }}
+                />
+
+                <div className="flex justify-between text-xs text-white/70">
+                  <span>{formatTime(currentSong.time)}</span>
+                  <span>{formatTime(currentSong.duration)}</span>
+                </div>
+              </div>
+
+              {/* Controls */}
+              <div className="flex items-center justify-between w-full">
+                <div className="w-12"></div> {/* Empty space for balance */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={currentSong.is_playing ? pauseSong : playSong}
+                  className="h-14 w-14 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all duration-300"
+                  style={{
+                    background: dominantColor,
+                  }}
+                >
+                  {currentSong.is_playing ? <Pause size={28} /> : <Play size={28} className="ml-1" />}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={skipSong}
+                  className="h-12 w-12 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all duration-300"
+                >
+                  <SkipForward size={22} />
+                </Button>
+              </div>
+
+              {/* Skip votes */}
+              <div className="mt-4 flex items-center justify-center">
+                <div className="text-white/80 text-sm bg-white/10 px-4 py-2 rounded-full">
+                  {currentSong.total_votes}/{currentSong.votes_required_to_skip} votes to skip
+                </div>
+              </div>
+
+              {/* Equalizer animation (only shows when playing) */}
+              {currentSong.is_playing && (
+                <div className="mt-4 flex justify-center">
+                  <div className="equalizer">
+                    <div className="equalizer-bar h-3" style={{ background: dominantColor }}></div>
+                    <div className="equalizer-bar h-5" style={{ background: dominantColor }}></div>
+                    <div className="equalizer-bar h-8" style={{ background: dominantColor }}></div>
+                    <div className="equalizer-bar h-4" style={{ background: dominantColor }}></div>
+                    <div className="equalizer-bar h-6" style={{ background: dominantColor }}></div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  )
+}
+
+
+### Contents of: ./src/components/info.jsx ###
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowLeft, ArrowRight, SendToBackIcon as BackIcon, Music, Users } from "lucide-react"
+import { motion } from "framer-motion"
+
+const PAGES = {
+  JOIN: "pages.join",
+  CREATE: "pages.create",
+}
+
+export default function Info() {
+  const [page, setPage] = useState(PAGES.JOIN)
+
+  const joinInfo = () =>
+    "Enter a room code to join an existing session and enjoy music with others. You'll be able to see what's playing and interact based on the room settings."
+
+  const createInfo = () =>
+    "Create a new room, share the code with friends, and manage playback together. As a host, you can set permissions and control how many votes are needed to skip songs."
+
+  const handlePageToggle = () => {
+    setPage((prevPage) => (prevPage === PAGES.CREATE ? PAGES.JOIN : PAGES.CREATE))
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen p-4 animated-bg">
+      <div className="blob bg-purple-500"></div>
+      <div className="blob bg-pink-500"></div>
+      <div className="blob bg-blue-500"></div>
+      <div className="blob bg-indigo-500"></div>
+
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Card className="bg-black/40 backdrop-blur-md border-none shadow-2xl overflow-hidden rounded-3xl">
+          <CardHeader className="pt-8 pb-4">
+            <CardTitle className="text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 font-montserrat">
+              What is Roomify?
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-8 pt-4 space-y-8">
+            <motion.div
+              className="text-center space-y-6"
+              key={page}
+              initial={{ opacity: 0, x: page === PAGES.JOIN ? -20 : 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: page === PAGES.JOIN ? 20 : -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex justify-center">
+                {page === PAGES.JOIN ? (
+                  <div className="h-16 w-16 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <Users size={32} className="text-white" />
+                  </div>
+                ) : (
+                  <div className="h-16 w-16 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center shadow-lg shadow-pink-500/20">
+                    <Music size={32} className="text-white" />
+                  </div>
+                )}
+              </div>
+
+              <h3 className="text-2xl font-semibold text-white font-montserrat">
+                {page === PAGES.JOIN ? "Join a Room" : "Create a Room"}
+              </h3>
+
+              <p className="text-white/90 text-lg leading-relaxed">{page === PAGES.JOIN ? joinInfo() : createInfo()}</p>
+            </motion.div>
+
+            <div className="flex justify-center">
+              <Button
+                variant="ghost"
+                onClick={handlePageToggle}
+                className="text-white hover:bg-white/10 rounded-xl px-6 py-2 transition-all duration-300"
+              >
+                {page === PAGES.CREATE ? (
+                  <div className="flex items-center gap-2">
+                    <ArrowLeft size={18} />
+                    <span>Previous</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span>Next</span>
+                    <ArrowRight size={18} />
+                  </div>
+                )}
+              </Button>
+            </div>
+
+            <Button
+              asChild
+              variant="outline"
+              className="w-full h-14 text-lg font-medium rounded-xl bg-white/10 border-none text-white hover:bg-white/20 transition-all duration-300"
+            >
+              <Link href="/" className="flex items-center justify-center gap-2">
+                <BackIcon size={18} />
+                Back to Home
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  )
+}
+
+
+### Contents of: ./src/components/home-page.jsx ###
+"use client"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Music, Users, InfoIcon } from "lucide-react"
+import { motion } from "framer-motion"
+
+export default function HomePage() {
+  const [roomCode, setRoomCode] = useState(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    const fetchRoomCode = async () => {
+      try {
+        console.log('Checking if user is in a room');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inroom/`, {
+          credentials: "include",
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          console.log('Inroom check response:', data);
+          if (data.code) {
+            setRoomCode(data.code)
+          }
+        } else {
+          console.error('Failed to check inroom status:', response.status, response.statusText);
+        }
+      } catch (error) {
+        console.error("Failed to fetch room code:", error)
+      }
+    }
+
+    fetchRoomCode()
+  }, [])
+
+  useEffect(() => {
+    if (roomCode) {
+      router.push(`/room/${roomCode}`)
+    }
+  }, [roomCode, router])
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const item = {
+    hidden: { y: 20, opacity: 0 },
+    show: { y: 0, opacity: 1 },
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen p-4 animated-bg">
+      <div className="blob bg-purple-500"></div>
+      <div className="blob bg-pink-500"></div>
+      <div className="blob bg-blue-500"></div>
+      <div className="blob bg-indigo-500"></div>
+
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Card className="bg-black/40 backdrop-blur-md border-none shadow-2xl overflow-hidden rounded-3xl">
+          <CardContent className="p-8">
+            <motion.div
+              variants={container}
+              initial="hidden"
+              animate="show"
+              className="flex flex-col items-center space-y-8"
+            >
+              <motion.div variants={item} className="relative">
+                <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 tracking-tight font-montserrat">
+                  ROOMIFY
+                </h1>
+                <div className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-pink-400 to-transparent"></div>
+              </motion.div>
+
+              <motion.div variants={item} className="w-full space-y-4">
+                <Button
+                  asChild
+                  className="w-full h-14 text-lg font-medium rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 shadow-lg shadow-indigo-500/20"
+                >
+                  <Link href="/join" className="flex items-center justify-center gap-3">
+                    <Users size={22} />
+                    Join a Room
+                  </Link>
+                </Button>
+
+                <Button
+                  asChild
+                  className="w-full h-14 text-lg font-medium rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 transition-all duration-300 shadow-lg shadow-pink-500/20"
+                >
+                  <Link href="/create" className="flex items-center justify-center gap-3">
+                    <Music size={22} />
+                    Create a Room
+                  </Link>
+                </Button>
+
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="w-full h-14 text-lg font-medium rounded-xl text-white hover:bg-white/10 transition-all duration-300 backdrop-blur-sm"
+                >
+                  <Link href="/info" className="flex items-center justify-center gap-3">
+                    <InfoIcon size={22} />
+                    Info
+                  </Link>
+                </Button>
+              </motion.div>
+            </motion.div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  )
+}
+
+
+### Contents of: ./src/components/sonner-provider.jsx ###
+"use client"
+
+import { Toaster } from "sonner"
+
+export function SonnerProvider() {
+  return (
+    <Toaster
+      position="top-right"
+      richColors
+      closeButton
+      theme="dark"
+      toastOptions={{
+        style: {
+          background: "rgba(30, 30, 30, 0.8)",
+          backdropFilter: "blur(10px)",
+          color: "white",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          borderRadius: "12px",
+        },
+        className: "font-medium",
+      }}
+    />
+  )
+}
+
+
+### Contents of: ./src/components/theme-provider.jsx ###
+"use client"
+
+import { ThemeProvider as NextThemesProvider } from "next-themes"
+
+export function ThemeProvider({ children, ...props }) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
+}
+
+
+### Contents of: ./src/components/room.jsx ###
+"use client"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Settings, LogOut } from "lucide-react"
+import MusicPlayer from "@/components/music-player"
+import CreateRoomPage from "@/components/create-room-page"
+import { toast } from "sonner"
+import { motion } from "framer-motion"
+
+export default function Room({ roomCode }) {
+  const router = useRouter()
+  const [viewSettings, setViewSettings] = useState(false)
+  const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false)
+  const [song, setSong] = useState({})
+  const [roomDetails, setRoomDetails] = useState({
+    votesToSkip: 2,
+    guestCanPause: false,
+    isHost: false,
+  })
+  const [isHost, setIsHost] = useState(false)
+
+  useEffect(() => {
+    const getRoomDetails = async () => {
+      try {
+        console.log('Fetching room details for code:', roomCode);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/get/?code=${roomCode}`, {
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        })
+
+        if (!response.ok) {
+          console.error('Failed to get room details:', response.status, response.statusText);
+          leaveRoom()
+          return
+        }
+
+        const data = await response.json()
+        console.log('Received room details:', data);
+        setRoomDetails({
+          votesToSkip: data.votes_to_skip,
+          guestCanPause: data.guest_can_pause,
+          isHost: data.is_host,
+        })
+        setIsHost(data.is_host)
+
+        if (data.is_host) {
+          authenticateSpotify()
+        }
+      } catch (error) {
+        console.error("Failed to get room details:", error)
+        leaveRoom()
+      }
+    }
+
+    getRoomDetails()
+  }, [roomCode])
+
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key === "userLeftRoom") {
+        router.push("/")
+        localStorage.removeItem("userLeftRoom")
+      }
+    }
+
+    window.addEventListener("storage", handleStorageChange)
+    return () => window.removeEventListener("storage", handleStorageChange)
+  }, [router])
+
+  const authenticateSpotify = async () => {
+    try {
+      console.log('Checking Spotify authentication status');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/spotify/is-authenticated/`, {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      })
+      const data = await response.json()
+      console.log('Spotify authentication status:', data);
+      setSpotifyAuthenticated(data.status)
+
+      if (!data.status) {
+        console.log('Initiating Spotify authentication');
+        const authResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/spotify/get-auth-url/`, {
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        })
+
+        const authData = await authResponse.json()
+        console.log('Received Spotify auth URL:', authData);
+        localStorage.setItem("spotifyAuthRedirect", roomCode)
+        window.location.replace(authData.url)
+      }
+    } catch (error) {
+      console.error("Failed to authenticate Spotify:", error)
+      toast.error("Spotify Authentication Failed. Please try again later")
+    }
+  }
+
+  useEffect(() => {
+    const getCurrentSong = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/spotify/current-song/`, {
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        })
+
+        if (response.status === 204) {
+          console.log("No song playing")
+          setSong({})
+          return
+        }
+
+        if (response.status === 403) {
+          console.log("Host is not authenticated with Spotify")
+          setSong({
+            title: "Host not authenticated",
+            artist: "Please ask the host to connect to Spotify",
+            image_url: "/placeholder.svg?height=300&width=300",
+            is_playing: false,
+          })
+          return
+        }
+
+        if (response.status === 500) {
+          console.log("Failed to fetch current song")
+          setSong({
+            title: "Error fetching song",
+            artist: "Please try again later",
+            image_url: "/placeholder.svg?height=300&width=300",
+            is_playing: false,
+          })
+          return
+        }
+
+        if (response.ok) {
+          const data = await response.json()
+          setSong(data)
+        }
+      } catch (error) {
+        console.error("Failed to get current song:", error)
+        setSong({
+          title: "Connection error",
+          artist: "Please check your connection",
+          image_url: "/placeholder.svg?height=300&width=300",
+          is_playing: false,
+        })
+      }
+    }
+
+    // Only authenticate Spotify for host
+    if (isHost && !spotifyAuthenticated) {
+      authenticateSpotify()
+    } else {
+      // For guests or authenticated host, start fetching current song
+      getCurrentSong()
+      const interval = setInterval(getCurrentSong, 5000)
+      return () => clearInterval(interval)
+    }
+  }, [isHost, spotifyAuthenticated])
+
+  const leaveRoom = async () => {
+    try {
+      localStorage.setItem("userLeftRoom", "true")
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/leave/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      })
+      router.push("/")
+    } catch (error) {
+      console.error("Failed to leave room:", error)
+      router.push("/")
+    }
+  }
+
+  const updateRoomDetails = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/get/?code=${roomCode}`, {
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setRoomDetails({
+          votesToSkip: data.votes_to_skip,
+          guestCanPause: data.guest_can_pause,
+          isHost: data.is_host,
+        })
+        setIsHost(data.is_host)
+        setViewSettings(false)
+      }
+    } catch (error) {
+      console.error("Failed to update room details:", error)
+    }
+  }
+
+  if (viewSettings) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <CreateRoomPage
+          update={true}
+          votesToSkip={roomDetails.votesToSkip}
+          guestCanPause={roomDetails.guestCanPause}
+          roomCode={roomCode}
+          updateCallback={updateRoomDetails}
+        />
+      </div>
+    )
+  }
+
+  return (
+    <div className={`flex items-center justify-center h-[100dvh] p-4 animated-bg room-${roomCode} overflow-hidden`}>
+      <div className="blob bg-purple-500"></div>
+      <div className="blob bg-pink-500"></div>
+      <div className="blob bg-blue-500"></div>
+      <div className="blob bg-indigo-500"></div>
+
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md"
+      >
+        <Card className="glass-dark border-none shadow-2xl overflow-hidden rounded-3xl">
+          <CardContent className="p-4">
+            <div className="flex flex-col items-center space-y-3">
+              <div className="w-full flex justify-between items-center">
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-white font-montserrat">Room</h2>
+                    <div className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+                      <code className="text-white/90 font-mono">{roomCode}</code>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={leaveRoom}
+                  className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all duration-300"
+                >
+                  <LogOut size={18} />
+                </Button>
+              </div>
+
+              <MusicPlayer song={song} roomCode={roomCode} />
+
+              {roomDetails.isHost && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="w-full"
+                >
+                  <Button
+                    onClick={() => setViewSettings(true)}
+                    className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-white/10 hover:bg-white/20 transition-all duration-300"
+                    variant="outline"
+                  >
+                    <Settings size={18} />
+                    Room Settings
+                  </Button>
+                </motion.div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  )
+}
+
+
+### Contents of: ./src/lib/utils.js ###
+import { clsx } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export const cn = (...inputs) => {
+  return twMerge(clsx(inputs))
+}
+
+// Color extraction utility
+export const getAverageColor = (imageElement) => {
+  const canvas = document.createElement("canvas")
+  const context = canvas.getContext("2d")
+
+  canvas.width = imageElement.width
+  canvas.height = imageElement.height
+
+  context.drawImage(imageElement, 0, 0)
+
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height).data
+
+  let r = 0,
+    g = 0,
+    b = 0,
+    count = 0
+
+  // Sample pixels (every 5th pixel to improve performance)
+  for (let i = 0; i < imageData.length; i += 20) {
+    r += imageData[i]
+    g += imageData[i + 1]
+    b += imageData[i + 2]
+    count++
+  }
+
+  // Calculate average
+  r = Math.floor(r / count)
+  g = Math.floor(g / count)
+  b = Math.floor(b / count)
+
+  return { r, g, b }
+}
+
+// Format time in minutes:seconds
+export const formatTime = (seconds) => {
+  const mins = Math.floor(seconds / 60)
+  const secs = Math.floor(seconds % 60)
+  return `${mins}:${secs < 10 ? "0" : ""}${secs}`
+}

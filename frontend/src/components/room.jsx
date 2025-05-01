@@ -113,22 +113,13 @@ export default function Room({ roomCode }) {
           return
         }
 
-        if (response.status === 403) {
+        const data = await response.json()
+        
+        if (data.host_authenticated === false) {
           console.log("Host is not authenticated with Spotify")
           setSong({
-            title: "Host not authenticated",
-            artist: "Please ask the host to connect to Spotify",
-            image_url: "/placeholder.svg?height=300&width=300",
-            is_playing: false,
-          })
-          return
-        }
-
-        if (response.status === 500) {
-          console.log("Failed to fetch current song")
-          setSong({
-            title: "Error fetching song",
-            artist: "Please try again later",
+            title: "Waiting for host",
+            artist: "Host needs to connect to Spotify",
             image_url: "/placeholder.svg?height=300&width=300",
             is_playing: false,
           })
@@ -136,7 +127,6 @@ export default function Room({ roomCode }) {
         }
 
         if (response.ok) {
-          const data = await response.json()
           setSong(data)
         }
       } catch (error) {
@@ -153,12 +143,12 @@ export default function Room({ roomCode }) {
     // Only authenticate Spotify for host
     if (isHost && !spotifyAuthenticated) {
       authenticateSpotify()
-    } else {
-      // For guests or authenticated host, start fetching current song
-      getCurrentSong()
-      const interval = setInterval(getCurrentSong, 5000)
-      return () => clearInterval(interval)
     }
+    
+    // For all users (host and guests), start fetching current song
+    getCurrentSong()
+    const interval = setInterval(getCurrentSong, 5000)
+    return () => clearInterval(interval)
   }, [isHost, spotifyAuthenticated])
 
   const leaveRoom = async () => {

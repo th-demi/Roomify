@@ -246,62 +246,54 @@ class CurrentSongView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Check if host is authenticated with Spotify
-        if not is_spotify_authenticated(room.host):
+        # Check host authentication but don't block the response
+        host_authenticated = is_spotify_authenticated(room.host)
+        if not host_authenticated:
+            return Response({
+                'host_authenticated': False,
+                'message': 'Host is not authenticated with Spotify'
+            }, status=status.HTTP_200_OK)
+
+        # Get current song from Spotify
+        try:
+            endpoint = "player/currently-playing"
+            response = execute_spotify_api_request(room.host, endpoint)
+
+            if 'error' in response or 'item' not in response:
+                return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+            item = response.get('item')
+            duration = item.get('duration_ms')
+            progress = response.get('progress_ms')
+            album_cover = item.get('album').get('images')[0].get('url')
+            is_playing = response.get('is_playing')
+            song_id = item.get('id')
+
+            # Get votes for this song
+            votes = len(Vote.objects.filter(room=room, song_id=song_id))
+
+            song = {
+                'title': item.get('name'),
+                'artist': item.get('artists')[0].get('name'),
+                'duration': duration,
+                'time': progress,
+                'image_url': album_cover,
+                'is_playing': is_playing,
+                'votes': votes,
+                'votes_required': room.votes_to_skip,
+                'id': song_id,
+                'host_authenticated': True
+            }
+
+            self.update_room_song(room, song_id)
+
+            return Response(song, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"Error getting current song: {str(e)}")
             return Response(
-                {'error': 'Host is not authenticated with Spotify'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        # Get currently playing song from Spotify using host's tokens
-        endpoint = "player/currently-playing"
-        response = execute_spotify_api_request(room.host, endpoint)
-
-        print("Current song response:", response)
-
-        # Handle error or no song playing
-        if 'error' in response:
-            print(f"Spotify API error: {response['error']}")
-            return Response(
-                {'error': 'Failed to fetch current song from Spotify'},
+                {'error': 'Failed to get current song'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-        if 'item' not in response:
-            return Response({}, status=status.HTTP_204_NO_CONTENT)
-
-        # Extract song information
-        item = response.get('item')
-        duration = item.get('duration_ms')
-        progress = response.get('progress_ms')
-        album_cover = item.get('album').get('images')[0].get('url')
-        is_playing = response.get('is_playing')
-        song_id = item.get('id')
-
-        # Format artist names
-        artist_string = ", ".join([artist.get('name')
-                                  for artist in item.get('artists')])
-
-        # Count votes for this song
-        votes = Vote.objects.filter(room=room, song_id=song_id).count()
-
-        # Create song object
-        song = {
-            'title': item.get('name'),
-            'artist': artist_string,
-            'duration': duration,
-            'time': progress,
-            'image_url': album_cover,
-            'is_playing': is_playing,
-            'votes_required_to_skip': room.votes_to_skip,
-            'total_votes': votes,
-            'id': song_id
-        }
-
-        # Update room's current song
-        self.update_room_song(room, song_id)
-
-        return Response(song, status=status.HTTP_200_OK)
 
     def update_room_song(self, room, song_id):
         """
