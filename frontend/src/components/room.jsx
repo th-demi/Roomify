@@ -100,8 +100,6 @@ export default function Room({ roomCode }) {
   }
 
   useEffect(() => {
-    if (!spotifyAuthenticated) return
-
     const getCurrentSong = async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/spotify/current-song/`, {
@@ -152,11 +150,16 @@ export default function Room({ roomCode }) {
       }
     }
 
-    getCurrentSong()
-    const interval = setInterval(getCurrentSong, 5000)
-
-    return () => clearInterval(interval)
-  }, [spotifyAuthenticated])
+    // Only authenticate Spotify for host
+    if (isHost && !spotifyAuthenticated) {
+      authenticateSpotify()
+    } else {
+      // For guests or authenticated host, start fetching current song
+      getCurrentSong()
+      const interval = setInterval(getCurrentSong, 5000)
+      return () => clearInterval(interval)
+    }
+  }, [isHost, spotifyAuthenticated])
 
   const leaveRoom = async () => {
     try {
