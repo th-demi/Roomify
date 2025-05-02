@@ -27,7 +27,7 @@ export default function Room({ roomCode }) {
       try {
         console.log('Fetching room details for code:', roomCode);
         // First, ensure we have a valid session
-        const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user-in-room/`, {
+        const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inroom/`, {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
         });
@@ -130,7 +130,7 @@ export default function Room({ roomCode }) {
         if (response.status === 404 && data.error === "Not in a room") {
           console.log("Not in a room, refreshing session...")
           // Try to refresh the session
-          const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user-in-room/`, {
+          const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inroom/`, {
             credentials: "include",
             headers: { "Content-Type": "application/json" },
           });
