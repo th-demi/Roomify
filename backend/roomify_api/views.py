@@ -91,9 +91,11 @@ class GetRoomView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Store room code in session
+        # Store room code in session and ensure it's saved
         request.session['room_code'] = code
+        request.session.save()  # Explicitly save the session
         print("Room code stored in session:", code)
+        print("Session saved with room code:", request.session.get('room_code'))
 
         # Get room data and add is_host field
         data = RoomSerializer(room).data
@@ -143,9 +145,11 @@ class JoinRoomView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
 
-            # Store room code in session
+            # Store room code in session and ensure it's saved
             request.session['room_code'] = code
+            request.session.save()  # Explicitly save the session
             print("Room code stored in session:", code)
+            print("Session saved with room code:", request.session.get('room_code'))
 
             # Return room details
             data = RoomSerializer(room).data
