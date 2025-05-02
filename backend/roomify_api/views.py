@@ -91,6 +91,12 @@ class GetRoomView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+        # Ensure session exists and is saved
+        if not request.session.exists(request.session.session_key):
+            request.session.create()
+            request.session.save()
+            print("New session created in GetRoomView:", request.session.session_key)
+
         # Store room code in session and ensure it's saved
         request.session['room_code'] = code
         request.session.save()  # Explicitly save the session
@@ -100,8 +106,7 @@ class GetRoomView(APIView):
         # Get room data and add is_host field
         data = RoomSerializer(room).data
         print(f"Room host: {room.host}")
-        print(
-            f"Session key exists: {request.session.exists(request.session.session_key)}")
+        print(f"Session key exists: {request.session.exists(request.session.session_key)}")
         print(f"Session key: {request.session.session_key}")
         print("Room code in session:", request.session.get('room_code'))
         data['is_host'] = request.session.session_key == room.host
@@ -180,7 +185,7 @@ class UserInRoomView(APIView):
             print("Session exists:", request.session.exists(request.session.session_key))
             print("Current room code in session:", request.session.get('room_code'))
 
-            # Ensure session exists
+            # Ensure session exists and is saved
             if not request.session.exists(request.session.session_key):
                 print("Creating new session...")
                 request.session.create()
@@ -201,6 +206,7 @@ class UserInRoomView(APIView):
             if not room:
                 print(f"Room not found for code: {room_code}")
                 request.session.pop('room_code', None)
+                request.session.save()
                 return Response(
                     {'code': None, 'session_key': request.session.session_key},
                     status=status.HTTP_200_OK
@@ -214,6 +220,7 @@ class UserInRoomView(APIView):
                 'room_details': RoomSerializer(room).data
             }
             print("User is host:", data['is_host'])
+            print("Room code in response:", data['code'])
 
             return Response(data, status=status.HTTP_200_OK)
 
