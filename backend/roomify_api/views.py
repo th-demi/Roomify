@@ -129,7 +129,7 @@ class JoinRoomView(APIView):
             print("Session exists:", request.session.exists(request.session.session_key))
             print("Current room code in session:", request.session.get('room_code'))
 
-            # Ensure session exists
+            # Ensure session exists and is saved
             if not request.session.exists(request.session.session_key):
                 print("Creating new session for guest...")
                 request.session.create()
@@ -156,10 +156,21 @@ class JoinRoomView(APIView):
             print("Room code stored in session:", code)
             print("Session saved with room code:", request.session.get('room_code'))
 
+            # Verify the room code was stored correctly
+            stored_code = request.session.get('room_code')
+            if stored_code != code:
+                print(f"Warning: Room code mismatch. Expected: {code}, Got: {stored_code}")
+                return Response(
+                    {'error': 'Failed to store room code in session'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
             # Return room details
             data = RoomSerializer(room).data
             data['is_host'] = request.session.session_key == room.host
             print("User is host:", data['is_host'])
+            print("Session key after join:", request.session.session_key)
+            print("Room code in session after join:", request.session.get('room_code'))
 
             return Response(data, status=status.HTTP_200_OK)
 
@@ -196,6 +207,8 @@ class UserInRoomView(APIView):
             room_code = request.session.get('room_code')
             if not room_code:
                 print("No room code found in session")
+                print("Session key:", request.session.session_key)
+                print("Session exists:", request.session.exists(request.session.session_key))
                 return Response(
                     {'code': None, 'session_key': request.session.session_key},
                     status=status.HTTP_200_OK
@@ -207,6 +220,7 @@ class UserInRoomView(APIView):
                 print(f"Room not found for code: {room_code}")
                 request.session.pop('room_code', None)
                 request.session.save()
+                print("Removed room code from session")
                 return Response(
                     {'code': None, 'session_key': request.session.session_key},
                     status=status.HTTP_200_OK
@@ -221,6 +235,8 @@ class UserInRoomView(APIView):
             }
             print("User is host:", data['is_host'])
             print("Room code in response:", data['code'])
+            print("Session key in response:", data['session_key'])
+            print("Room code in session:", request.session.get('room_code'))
 
             return Response(data, status=status.HTTP_200_OK)
 
