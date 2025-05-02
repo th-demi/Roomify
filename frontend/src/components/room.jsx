@@ -26,6 +26,7 @@ export default function Room({ roomCode }) {
     const getRoomDetails = async () => {
       try {
         console.log('Fetching room details for code:', roomCode);
+        
         // First, ensure we have a valid session
         const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inroom/`, {
           credentials: "include",
@@ -37,6 +38,9 @@ export default function Room({ roomCode }) {
           return;
         }
 
+        const sessionData = await sessionResponse.json();
+        console.log('Session data:', sessionData);
+
         // Join the room
         const joinResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/join/`, {
           method: "POST",
@@ -47,6 +51,30 @@ export default function Room({ roomCode }) {
 
         if (!joinResponse.ok) {
           console.error('Failed to join room:', joinResponse.status, joinResponse.statusText);
+          leaveRoom();
+          return;
+        }
+
+        const joinData = await joinResponse.json();
+        console.log('Join response:', joinData);
+
+        // Verify the room code was stored in the session
+        const verifyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inroom/`, {
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!verifyResponse.ok) {
+          console.error('Failed to verify session:', verifyResponse.status, verifyResponse.statusText);
+          leaveRoom();
+          return;
+        }
+
+        const verifyData = await verifyResponse.json();
+        console.log('Session verification:', verifyData);
+
+        if (!verifyData.code) {
+          console.error('Room code not found in session after join');
           leaveRoom();
           return;
         }
