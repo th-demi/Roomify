@@ -37,38 +37,52 @@ export default function Room({ roomCode }) {
           return;
         }
 
-        // Then get room details
+        // Join the room
+        const joinResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/join/`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: roomCode }),
+        });
+
+        if (!joinResponse.ok) {
+          console.error('Failed to join room:', joinResponse.status, joinResponse.statusText);
+          leaveRoom();
+          return;
+        }
+
+        // Get room details
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/get/?code=${roomCode}`, {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-        })
+        });
 
         if (!response.ok) {
           console.error('Failed to get room details:', response.status, response.statusText);
-          leaveRoom()
-          return
+          leaveRoom();
+          return;
         }
 
-        const data = await response.json()
+        const data = await response.json();
         console.log('Received room details:', data);
         setRoomDetails({
           votesToSkip: data.votes_to_skip,
           guestCanPause: data.guest_can_pause,
           isHost: data.is_host,
-        })
-        setIsHost(data.is_host)
+        });
+        setIsHost(data.is_host);
 
         if (data.is_host) {
-          authenticateSpotify()
+          authenticateSpotify();
         }
       } catch (error) {
-        console.error("Failed to get room details:", error)
-        leaveRoom()
+        console.error("Failed to get room details:", error);
+        leaveRoom();
       }
-    }
+    };
 
-    getRoomDetails()
-  }, [roomCode])
+    getRoomDetails();
+  }, [roomCode]);
 
   useEffect(() => {
     const handleStorageChange = (event) => {
