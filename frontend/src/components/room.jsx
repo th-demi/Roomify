@@ -26,6 +26,18 @@ export default function Room({ roomCode }) {
     const getRoomDetails = async () => {
       try {
         console.log('Fetching room details for code:', roomCode);
+        // First, ensure we have a valid session
+        const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user-in-room/`, {
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+        });
+        
+        if (!sessionResponse.ok) {
+          console.error('Failed to get session:', sessionResponse.status, sessionResponse.statusText);
+          return;
+        }
+
+        // Then get room details
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/get/?code=${roomCode}`, {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
@@ -114,6 +126,32 @@ export default function Room({ roomCode }) {
         }
 
         const data = await response.json()
+        
+        if (response.status === 404 && data.error === "Not in a room") {
+          console.log("Not in a room, refreshing session...")
+          // Try to refresh the session
+          const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/user-in-room/`, {
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          });
+          
+          if (!sessionResponse.ok) {
+            console.error('Failed to refresh session:', sessionResponse.status, sessionResponse.statusText);
+            return;
+          }
+          
+          // Retry getting current song
+          const retryResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/spotify/current-song/`, {
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+          });
+          
+          if (retryResponse.ok) {
+            const retryData = await retryResponse.json();
+            setSong(retryData);
+            return;
+          }
+        }
         
         if (data.host_authenticated === false) {
           console.log("Host is not authenticated with Spotify")
