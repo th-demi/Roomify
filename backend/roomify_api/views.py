@@ -152,6 +152,7 @@ class JoinRoomView(APIView):
 
             # Store room code in session and ensure it's saved
             request.session['room_code'] = code
+            request.session.modified = True  # Mark session as modified
             request.session.save()  # Explicitly save the session
             print("Room code stored in session:", code)
             print("Session saved with room code:", request.session.get('room_code'))
@@ -207,37 +208,24 @@ class UserInRoomView(APIView):
             room_code = request.session.get('room_code')
             if not room_code:
                 print("No room code found in session")
-                print("Session key:", request.session.session_key)
-                print("Session exists:", request.session.exists(request.session.session_key))
-                return Response(
-                    {'code': None, 'session_key': request.session.session_key},
-                    status=status.HTTP_200_OK
-                )
+                return Response({'code': None, 'session_key': request.session.session_key}, status=status.HTTP_200_OK)
 
             # Get room details
             room = Room.objects.filter(code=room_code).first()
             if not room:
-                print(f"Room not found for code: {room_code}")
-                request.session.pop('room_code', None)
+                print("Room not found for code:", room_code)
+                request.session['room_code'] = None
+                request.session.modified = True
                 request.session.save()
-                print("Removed room code from session")
-                return Response(
-                    {'code': None, 'session_key': request.session.session_key},
-                    status=status.HTTP_200_OK
-                )
+                return Response({'code': None, 'session_key': request.session.session_key}, status=status.HTTP_200_OK)
 
             # Return room details
             data = {
                 'code': room_code,
                 'session_key': request.session.session_key,
-                'is_host': request.session.session_key == room.host,
-                'room_details': RoomSerializer(room).data
+                'is_host': request.session.session_key == room.host
             }
-            print("User is host:", data['is_host'])
-            print("Room code in response:", data['code'])
-            print("Session key in response:", data['session_key'])
-            print("Room code in session:", request.session.get('room_code'))
-
+            print("UserInRoom response:", data)
             return Response(data, status=status.HTTP_200_OK)
 
         except Exception as e:

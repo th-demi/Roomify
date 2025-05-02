@@ -41,6 +41,12 @@ export default function Room({ roomCode }) {
         const sessionData = await sessionResponse.json();
         console.log('Session data:', sessionData);
 
+        // If we're already in a room, verify it's the same room
+        if (sessionData.code && sessionData.code !== roomCode) {
+          console.log('Already in a different room, leaving first...');
+          await leaveRoom();
+        }
+
         // Join the room
         const joinResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/join/`, {
           method: "POST",
@@ -57,27 +63,6 @@ export default function Room({ roomCode }) {
 
         const joinData = await joinResponse.json();
         console.log('Join response:', joinData);
-
-        // Verify the room code was stored in the session
-        const verifyResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inroom/`, {
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        });
-
-        if (!verifyResponse.ok) {
-          console.error('Failed to verify session:', verifyResponse.status, verifyResponse.statusText);
-          leaveRoom();
-          return;
-        }
-
-        const verifyData = await verifyResponse.json();
-        console.log('Session verification:', verifyData);
-
-        if (!verifyData.code) {
-          console.error('Room code not found in session after join');
-          leaveRoom();
-          return;
-        }
 
         // Get room details
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/get/?code=${roomCode}`, {
