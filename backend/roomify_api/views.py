@@ -208,7 +208,11 @@ class UserInRoomView(APIView):
             room_code = request.session.get('room_code')
             if not room_code:
                 print("No room code found in session")
-                return Response({'code': None, 'session_key': request.session.session_key}, status=status.HTTP_200_OK)
+                return Response({
+                    'code': None, 
+                    'session_key': request.session.session_key,
+                    'is_host': False
+                }, status=status.HTTP_200_OK)
 
             # Get room details
             room = Room.objects.filter(code=room_code).first()
@@ -217,7 +221,11 @@ class UserInRoomView(APIView):
                 request.session['room_code'] = None
                 request.session.modified = True
                 request.session.save()
-                return Response({'code': None, 'session_key': request.session.session_key}, status=status.HTTP_200_OK)
+                return Response({
+                    'code': None, 
+                    'session_key': request.session.session_key,
+                    'is_host': False
+                }, status=status.HTTP_200_OK)
 
             # Return room details
             data = {

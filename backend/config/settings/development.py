@@ -1,6 +1,15 @@
 from .base import *
+import os
 
 DEBUG = True
+
+# Override database settings for development
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+}
 
 # Explicitly set cookie/session settings correctly for local HTTP development
 SESSION_COOKIE_SAMESITE = 'Lax'

@@ -21,6 +21,8 @@ export default function Room({ roomCode }) {
     isHost: false,
   })
   const [isHost, setIsHost] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const getRoomDetails = async () => {
@@ -91,6 +93,8 @@ export default function Room({ roomCode }) {
       } catch (error) {
         console.error("Failed to get room details:", error);
         leaveRoom();
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -252,6 +256,84 @@ export default function Room({ roomCode }) {
       console.error("Failed to update room details:", error)
     }
   }
+
+  const checkSessionAndJoinRoom = async () => {
+    try {
+      // First check if we're already in a room
+      const inRoomResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/inroom/`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const inRoomData = await inRoomResponse.json();
+      console.log('InRoom response:', inRoomData);
+
+      if (inRoomData.code) {
+        // We're already in a room, fetch its details
+        const roomResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/room/${inRoomData.code}/`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (roomResponse.ok) {
+          const roomData = await roomResponse.json();
+          setRoomDetails(roomData);
+          setIsHost(roomData.is_host);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // If we're not in a room, try to join
+      const joinResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/join/`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: roomCode,
+          name: guestName,
+        }),
+      });
+
+      if (!joinResponse.ok) {
+        const errorData = await joinResponse.json();
+        throw new Error(errorData.error || 'Failed to join room');
+      }
+
+      const joinData = await joinResponse.json();
+      console.log('Join response:', joinData);
+
+      // After joining, get the room details
+      const roomResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/room/${roomCode}/`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!roomResponse.ok) {
+        throw new Error('Failed to fetch room details');
+      }
+
+      const roomData = await roomResponse.json();
+      setRoomDetails(roomData);
+      setIsHost(roomData.is_host);
+    } catch (error) {
+      console.error('Error joining room:', error);
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (viewSettings) {
     return (

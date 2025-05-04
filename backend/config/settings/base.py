@@ -50,7 +50,7 @@ CORS_EXPOSE_HEADERS = [
     'Access-Control-Allow-Origin',
     'Access-Control-Allow-Credentials',
 ]
-CORS_ORIGIN_ALLOW_ALL = True  # Temporarily allow all origins for testing
+CORS_ORIGIN_ALLOW_ALL = False  # Set to false to ensure proper CORS handling
 
 # Session settings
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -60,8 +60,10 @@ SESSION_COOKIE_SAMESITE = 'None'
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_DOMAIN = None  # Allow cookies for all domains
 SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_PATH = '/'  # Ensure cookie is set for all paths
 CSRF_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_PATH = '/'  # Ensure CSRF cookie is set for all paths
 CSRF_TRUSTED_ORIGINS = [
     "https://demi-roomify.vercel.app",
     "http://localhost:3000",
