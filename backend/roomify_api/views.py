@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Room
 from .serializers import RoomSerializer, CreateRoomSerializer, UpdateRoomSerializer
+from django.contrib.sessions.models import Session
 
 
 class RoomListView(generics.ListAPIView):
@@ -196,13 +197,27 @@ class UserInRoomView(APIView):
             print("Session key:", request.session.session_key)
             print("Session exists:", request.session.exists(request.session.session_key))
             print("Current room code in session:", request.session.get('room_code'))
+            print("Cookie header:", request.headers.get('Cookie'))
 
-            # Ensure session exists and is saved
-            if not request.session.exists(request.session.session_key):
-                print("Creating new session...")
+            # Check if we have a session cookie
+            session_cookie = request.COOKIES.get('sessionid')
+            if session_cookie:
+                print("Found session cookie:", session_cookie)
+                # Try to get the session
+                try:
+                    session = Session.objects.get(session_key=session_cookie)
+                    print("Found existing session in database")
+                    request.session = session
+                except Session.DoesNotExist:
+                    print("Session not found in database, creating new one")
+                    request.session.create()
+            else:
+                print("No session cookie found, creating new session")
                 request.session.create()
-                request.session.save()
-                print("New session key:", request.session.session_key)
+
+            # Ensure session is saved
+            request.session.save()
+            print("Session key after save:", request.session.session_key)
 
             # Get room code from session
             room_code = request.session.get('room_code')
